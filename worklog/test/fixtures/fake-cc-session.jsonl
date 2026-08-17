@@ -1,0 +1,2 @@
+{"timestamp":"2026-08-11T01:30:00.000Z","type":"user","message":{"content":"给记住我功能写测试"}}
+{"timestamp":"2026-08-11T01:35:00.000Z","type":"assistant","message":{"content":"补了 token 续期的 3 个测试用例"}}

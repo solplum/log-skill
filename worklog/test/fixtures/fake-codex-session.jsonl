@@ -1,0 +1,2 @@
+{"timestamp":"2026-08-12T02:06:02.000Z","type":"session_meta","payload":{"session_id":"fake-1","cwd":"/workspace/demo-project"}}
+{"timestamp":"2026-08-12T02:06:05.000Z","type":"event_msg","payload":{"type":"user_message","content":"实现匹配打分模块，测了 12 份 JD"}}

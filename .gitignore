@@ -1,0 +1,10 @@
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.DS_Store
+Thumbs.db
+.env
+*.sqlite
+报告文档/
+简历/
+alllog-data/
