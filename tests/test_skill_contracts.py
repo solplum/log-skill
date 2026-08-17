@@ -73,6 +73,27 @@ class PublishedSkillContractTests(unittest.TestCase):
         self.assertIn("Agent-Codex", text)
         self.assertIn("Agent-Zcode", text)
 
+    def test_change_report_frontmatter_and_workflow(self) -> None:
+        text = _read("change-report/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*change-report\s*$")
+        for needle in (
+            "报告文档/代码",
+            "变更记录.md",
+            "只追加",
+            "只读",
+            "无代码",
+            "无敏感",
+            "一句话目标",
+            "本次改动",
+            "改动文件",
+            "验证结果",
+            "原因待确认",
+            "_projects.json",
+            "docx",
+        ):
+            self.assertIn(needle, text)
+        self.assertTrue((REPO / "change-report/scripts/project_name.py").is_file())
+
     def test_test_notes_present(self) -> None:
         self.assertTrue((REPO / "worklog/test/test-worklog.md").is_file())
         self.assertTrue((REPO / "alllog/test/test-alllog.md").is_file())
@@ -97,7 +118,7 @@ class PublishedSkillContractTests(unittest.TestCase):
     def test_readme_english_first_and_complete(self) -> None:
         text = _read("README.md")
         en = text.find("# worklog + alllog")
-        zh = text.find("# worklog + alllog（中文）")
+        zh = text.find("# worklog + alllog + change-report（中文）")
         self.assertGreaterEqual(en, 0)
         self.assertGreater(zh, en)
         for needle in (
@@ -105,6 +126,7 @@ class PublishedSkillContractTests(unittest.TestCase):
             "~/.codex/skills/",
             "/worklog",
             "/alllog",
+            "/change-report",
             "ask then stop",
             "no self-answer",
             "Claude Code",
@@ -112,7 +134,9 @@ class PublishedSkillContractTests(unittest.TestCase):
             "ZCode",
             "ALLLOG_DATA_ROOT",
             "报告文档/需求",
+            "报告文档/代码",
             "timezone",
+            "change-report",
         ):
             self.assertIn(needle, text)
 
