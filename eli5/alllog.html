@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · alllog —— 从 AI 聊天记录里挖简历素材的技能</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#2a7de1; --soft:#eaf1fa; --line:#c9d6e8; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#5d6b80; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#ecf4ff,#fbfdff); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#566173; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 你说："; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .warn { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .warn b { color:var(--accent); }
+  .tree { font-family:Consolas,monospace; background:#233043; color:#cfe3c8; border-radius:14px; padding:20px 26px; font-size:14.5px; line-height:1.9; overflow-x:auto; }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 讲解 · alllog</span>
+  <h1>alllog：从聊天记录里挖简历素材</h1>
+  <div class="sub">把你在四个 AI 助手里干过的所有活，翻出来按项目归堆，挑出值得写上简历的那些。</div>
+
+  <div class="card analogy">
+    <b>一句话类比：</b>worklog 是<b>帮你记这周的笔记</b>，alllog 是<b>毕业整理档案柜</b>——它把你和 Claude Code / Codex / ZCode / MiniMax Code 的<b>全部历史聊天</b>翻一遍，按项目聚类，提炼出"做了什么、用了什么技术、结果多好"，列成编号清单让你勾选，最后汇总成一份按项目分组的<b>简历素材库</b>。
+  </div>
+
+  <h2>和 worklog 的核心区别</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">📅</div><h3>worklog</h3><p>只看<b>本周</b>，给老板看。周一命名一份日志。</p></div>
+    <div class="mini"><div class="ico">🗄</div><h3>alllog</h3><p>看<b>全部历史</b>，给未来的自己写简历用。按天累积，永不清理。</p></div>
+  </div>
+
+  <h2>一条红线：只能手动唤醒</h2>
+  <div class="warn">
+    对话里出现"素材库""记简历"这些词，<b>不会</b>自动触发 alllog。必须你显式打 <code>/alllog</code>。
+    <br><br>为什么？因为它要全量翻你的历史会话（可能上千个），是个重活，绝不能被一句闲聊误触发。
+  </div>
+
+  <h2>怎么用</h2>
+  <div class="say">/alllog</div>
+  <div class="say">全量梳理（挖简历素材）</div>
+  <div class="say">接着上次挖（续挖模式：从上次停点继续，最常用）</div>
+
+  <h2>挖一次的完整流程</h2>
+  <svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2a7de1"/></marker></defs>
+    <g font-size="14" text-anchor="middle">
+      <rect x="230" y="10" width="300" height="48" rx="10" fill="#2a7de1"/><text x="380" y="34" fill="#fff">① 选范围：全部 / 续挖 / 近30天 / 自定义</text><text x="380" y="50" fill="#cfe0f7" font-size="11">问完就停，等你答复</text>
+      <rect x="230" y="88" width="300" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="108">② 四源扫描（脚本给死）</text><text x="380" y="124" fill="#566173" font-size="11">CC · Codex索引 · ZCode库 · MiniMax</text>
+      <rect x="230" y="166" width="300" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="186">③ 会话 &gt; 50 个？先聚项目</text><text x="380" y="202" fill="#566173" font-size="11">列项目清单，问"挖哪几个？"→ 停</text>
+      <rect x="230" y="244" width="300" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="264">④ 深读所选，提编号候选</text><text x="380" y="280" fill="#566173" font-size="11">附四源覆盖度回执（挖了多少/漏没漏）</text>
+      <rect x="230" y="322" width="300" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="342">⑤ "要记哪几条？" → 停</text><text x="380" y="358" fill="#566173" font-size="11">你点名 1、3 就只写 1 和 3</text>
+      <rect x="230" y="392" width="300" height="42" rx="10" fill="#233043"/><text x="380" y="418" fill="#fff">落盘到 日志/（只追加）</text>
+      <line x1="380" y1="58" x2="380" y2="84" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="136" x2="380" y2="162" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="214" x2="380" y2="240" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="292" x2="380" y2="318" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="370" x2="380" y2="388" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+    </g>
+  </svg>
+
+  <h2>覆盖度回执：不许静默偷懒</h2>
+  <div class="card">
+    <p>每次给你看候选，必须<b>同屏附一张四源统计表</b>——这是被实测教训逼出来的规矩：曾经 AI 只挖了一个数据源，另外两个静默放弃，用户反问"只有这几天的吗"才穿帮。</p>
+    <div class="tree">| 源           | 扫描数 | 纳入 | 排除（原因）      |
+|--------------|--------|------|-------------------|
+| CC           | 120    | 86   | 空壳 14 / 日期外 20 |
+| Codex        | 0      | 0    | 该时段真空（写明！）|
+| ZCode        | 31     | 25   | 日期外 6          |
+| MiniMax Code | 12     | 9    | 纯注入 3          |</div>
+    <p style="color:#566173;font-size:14.5px;">纳入为 0 必须写明是"真的没有"还是"方法失败"——禁止静默缩水。</p>
+  </div>
+
+  <h2>素材存哪、怎么变成素材库</h2>
+  <div class="tree">$ALLLOG_DATA_ROOT/素材/          ← 数据根：环境变量可改，默认 ~/alllog
+├── 日志/2026-09-29.md   ← 唯一事实底账，只追加
+└── 整理/2026-09-29.md   ← 汇总快照（同日重生成），给做简历时读</div>
+  <div class="say">素材库</div>
+  <p>它读全部日志，按 <code>[项目名]</code> 归组，每项目五段：<b>背景 / 技术栈 / 亮点 / 结果 / 素材记录</b>。缺失的写"待补充"，禁止编造量化数字。</p>
+
+  <div class="foot">
+    这是 <b>worklog-alllog</b> 仓库四件套讲解之一：
+    <a href="worklog.html">worklog</a> ·
+    <a href="alllog.html">alllog</a> ·
+    <a href="change-report.html">change-report</a> ·
+    <a href="changelog.html">changelog</a>
+  </div>
+</div>
+</body>
+</html>

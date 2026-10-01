@@ -28,10 +28,10 @@ class ResolveDataRootTests(unittest.TestCase):
         got = paths.resolve_data_root({})
         self.assertEqual(got, Path.home() / "alllog")
 
-    def test_material_and_library_layout(self) -> None:
+    def test_journal_and_digest_layout(self) -> None:
         root = Path("/data/alllog-root")
-        self.assertEqual(paths.material_path("2026-08-17", root), root / "素材" / "2026-08-17.md")
-        self.assertEqual(paths.library_path(root), root / "简历素材库.md")
+        self.assertEqual(paths.journal_path("2026-08-17", root), root / "素材" / "日志" / "2026-08-17.md")
+        self.assertEqual(paths.digest_path("2026-08-17", root), root / "素材" / "整理" / "2026-08-17.md")
 
     def test_cli_prints_resolved_root(self) -> None:
         env = os.environ.copy()
@@ -45,27 +45,39 @@ class ResolveDataRootTests(unittest.TestCase):
         )
         self.assertEqual(proc.stdout.strip(), str(Path("/tmp/alllog-cli-root")))
 
-    def test_cli_material_and_library(self) -> None:
+    def test_cli_journal_and_digest(self) -> None:
         env = os.environ.copy()
         root = Path("/tmp/alllog-cli-root")
         env[paths.ENV_VAR] = str(root)
         script = str(REPO / "alllog" / "scripts" / "paths.py")
-        lib = subprocess.run(
-            [sys.executable, script, "--library"],
+        jr = subprocess.run(
+            [sys.executable, script, "--journal", "2026-08-01"],
             check=True,
             capture_output=True,
             text=True,
             env=env,
         )
-        mat = subprocess.run(
-            [sys.executable, script, "--material", "2026-08-01"],
+        dg = subprocess.run(
+            [sys.executable, script, "--digest", "2026-08-01"],
             check=True,
             capture_output=True,
             text=True,
             env=env,
         )
-        self.assertEqual(lib.stdout.strip(), str(root / "简历素材库.md"))
-        self.assertEqual(mat.stdout.strip(), str(root / "素材" / "2026-08-01.md"))
+        self.assertEqual(jr.stdout.strip(), str(root / "素材" / "日志" / "2026-08-01.md"))
+        self.assertEqual(dg.stdout.strip(), str(root / "素材" / "整理" / "2026-08-01.md"))
+
+    def test_latest_journal_day_reads_only_journal_files(self) -> None:
+        with __import__("tempfile").TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            journal = paths.journal_dir(root)
+            journal.mkdir(parents=True)
+            (journal / "2026-08-01.md").write_text("a", encoding="utf-8")
+            (journal / "2026-08-09.md").write_text("b", encoding="utf-8")
+            self.assertEqual(paths.latest_journal_day(root), "2026-08-09")
+            empty = Path(tmp) / "empty-root"
+            (paths.journal_dir(empty)).mkdir(parents=True)
+            self.assertIsNone(paths.latest_journal_day(empty))
 
 
 if __name__ == "__main__":

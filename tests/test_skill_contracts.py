@@ -33,6 +33,8 @@ class PublishedSkillContractTests(unittest.TestCase):
             "Claude Code",
             "Codex",
             "ZCode",
+            "MiniMax Code",
+            "上次搜索断点",
             "报告文档/需求/日志",
             "报告文档/需求/周报",
             "**需求背景**",
@@ -60,12 +62,37 @@ class PublishedSkillContractTests(unittest.TestCase):
             "~/.claude/projects",
             "Codex",
             "ZCode",
+            "MiniMax Code",
+            "ALLLOG_DATA_ROOT",
+            "素材/日志",
+            "素材/整理",
             "**背景**",
             "**技术栈**",
             "**亮点/难点**",
             "**结果/量化**",
         ):
             self.assertIn(needle, text)
+
+    def test_changelog_contract(self) -> None:
+        text = _read("changelog/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*changelog\s*$")
+        for needle in (
+            "Mentor 交接表",
+            "本次",
+            "本功能",
+            "references/evidence-routing.md",
+            "references/output-format.md",
+            "CHANGELOG.md",
+        ):
+            self.assertIn(needle, text)
+        self.assertTrue((REPO / "changelog/references/evidence-routing.md").is_file())
+        self.assertTrue((REPO / "changelog/references/output-format.md").is_file())
+        self.assertTrue((REPO / "changelog/agents/openai.yaml").is_file())
+        evidence = _read("changelog/references/evidence-routing.md")
+        self.assertIn("云端状态", evidence)
+        output = _read("changelog/references/output-format.md")
+        for needle in ("交付状态", "已上传", "已部署", "具体改动文件", "本次未发现已经落实的改动"):
+            self.assertIn(needle, output)
 
     def test_worklog_agent_contract_present(self) -> None:
         text = _read("worklog/references/agent-team-contract.md")
@@ -118,7 +145,7 @@ class PublishedSkillContractTests(unittest.TestCase):
     def test_readme_english_first_and_complete(self) -> None:
         text = _read("README.md")
         en = text.find("# worklog + alllog")
-        zh = text.find("# worklog + alllog + change-report（中文）")
+        zh = text.find("# worklog + alllog + change-report + changelog（中文）")
         self.assertGreaterEqual(en, 0)
         self.assertGreater(zh, en)
         for needle in (
@@ -127,16 +154,19 @@ class PublishedSkillContractTests(unittest.TestCase):
             "/worklog",
             "/alllog",
             "/change-report",
+            "/changelog",
             "ask then stop",
             "no self-answer",
             "Claude Code",
             "Codex",
             "ZCode",
+            "MiniMax Code",
             "ALLLOG_DATA_ROOT",
             "报告文档/需求",
             "报告文档/代码",
             "timezone",
             "change-report",
+            "eli5/",
         ):
             self.assertIn(needle, text)
 

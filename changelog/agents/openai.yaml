@@ -1,0 +1,4 @@
+interface:
+  display_name: "Changelog"
+  short_description: "将实际改动整理为 Mentor 交接表"
+  default_prompt: "Use $changelog to 汇总本次任务已经实际发生的改动，并生成 Mentor 交接表。"

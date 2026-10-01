@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · worklog —— 让 AI 替你写周报的技能</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#e8582a; --soft:#f0e9df; --line:#d8cfc0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#6b6257; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#fff4ec,#fffdf9); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#5c554b; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 你说："; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .stop { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .stop b { color:var(--accent); }
+  .tree { font-family:Consolas,monospace; background:#233043; color:#cfe3c8; border-radius:14px; padding:20px 26px; font-size:14.5px; line-height:1.9; overflow-x:auto; }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 讲解 · worklog</span>
+  <h1>worklog：让 AI 替你写周报</h1>
+  <div class="sub">它盯着你和四个 AI 助手的全部聊天记录，把你这周干的事写成一份老板能看懂的周报。</div>
+
+  <div class="card analogy">
+    <b>一句话类比：</b>你每天上班，老板周五要周报。worklog 就是一个<b>坐在你旁边帮你记笔记的助理</b>——你随口说一句它记一句；你没空说的时候，它自己去翻你和 Claude Code、Codex、ZCode、MiniMax Code 四个 AI 助手的聊天记录，把"这周做了什么"整理成候选清单，你点头哪些它才写哪些，最后组装成一份"需求叙事"周报。
+  </div>
+
+  <h2>它能干三件事</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">📝</div><h3>随手记（模式 B）</h3><p>你口述一句，它往本周的日志文件里追加一行。零摩擦，说啥记啥。</p></div>
+    <div class="mini"><div class="ico">🔍</div><h3>主动梳理（模式 A）</h3><p>它去翻四个助手的会话记录，列出编号候选，你点名才写入。</p></div>
+    <div class="mini"><div class="ico">📊</div><h3>出周报</h3><p>把本周日志 + 四路会话挖掘结果，合成"背景 → 方案 → 落地 → 结果"四段式周报，可导出 Word。</p></div>
+  </div>
+
+  <h2>怎么用？就这么说</h2>
+  <div class="say">记录一下：修好了登录页白屏的 bug</div>
+  <div class="say">梳理一下最近做了什么</div>
+  <div class="say">周报</div>
+  <p style="color:#6b6257;font-size:14.5px;">不用记命令，日常说人话就行。裸打 <code>/worklog</code> 它会先问你要哪种。</p>
+
+  <h2>最重要的一条规矩：先问，再动手</h2>
+  <div class="stop">
+    worklog 里有<b>"闸口"（hard gate）</b>：每当它列完候选，必须<b>停下来等你回复</b>，你点名"记 1、3"它才写 1 和 3。
+    <br><br>为什么不放心它？因为实测 AI 会"自问自答"——嘴上说"请问要记哪几条？"，下一句自己接"那我全记了"，一口气跑完。<b>没有你的确认 = 0 条写入</b>，这是写死在技能里的铁律。
+  </div>
+
+  <h2>周报长什么样</h2>
+  <div class="card">
+    <p>每条需求固定四段，缺数据的写"待补充"，<b>绝不编造数字</b>：</p>
+    <div class="tree"># 产出汇报（2026-09-28 ~ 2026-10-04）
+
+## 需求：发现页改版
+- <b>需求背景</b>：旧推荐流点击率低
+- <b>方案</b>：热度榜 + 个性化混排
+- <b>落地</b>：新排序上线，AB 双桶
+- <b>结果</b>：点击率 +12%（或：待补充）</div>
+  </div>
+
+  <h2>东西存在哪</h2>
+  <div class="tree">报告文档/需求/
+├── 日志/2026-09-28.md      ← 每周一命名，只追加，从不覆盖
+└── 周报/
+    ├── md形式/2026-09-28.md
+    └── word形式/2026-09-28.docx</div>
+  <p style="color:#6b6257;font-size:14.5px;">日志是底账，周报是快照——重新生成周报永远不动日志。</p>
+
+  <h2>一图看懂数据从哪来</h2>
+  <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e8582a"/></marker></defs>
+    <g font-size="14" text-anchor="middle">
+      <rect x="20" y="20" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="47">Claude Code 会话</text>
+      <rect x="20" y="80" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="107">Codex 会话</text>
+      <rect x="20" y="140" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="163">ZCode + MiniMax</text>
+      <rect x="300" y="80" width="150" height="44" rx="10" fill="#e8582a"/><text x="375" y="103" fill="#fff">worklog 挖掘</text><text x="375" y="119" fill="#fff" font-size="11">（转时区后过滤）</text>
+      <rect x="560" y="42" width="170" height="52" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="645" y="64">编号候选清单</text><text x="645" y="82" font-size="12">→ 停下等你点名</text>
+      <rect x="560" y="126" width="170" height="52" rx="10" fill="#233043"/><text x="645" y="148" fill="#fff">周报（四段式）</text><text x="645" y="166" fill="#aab8cc" font-size="12">md + Word</text>
+      <line x1="170" y1="42" x2="296" y2="92" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="170" y1="102" x2="296" y2="102" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="170" y1="162" x2="296" y2="112" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="450" y1="95" x2="556" y2="72" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="645" y1="94" x2="645" y2="122" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+    </g>
+  </svg>
+  <p style="text-align:center;color:#6b6257;font-size:14px;">你的口头记录 + 四个助手的历史会话 → 候选清单（你点名）→ 周报</p>
+
+  <div class="foot">
+    这是 <b>worklog-alllog</b> 仓库四件套讲解之一：
+    <a href="worklog.html">worklog</a> ·
+    <a href="alllog.html">alllog</a> ·
+    <a href="change-report.html">change-report</a> ·
+    <a href="changelog.html">changelog</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Agent Team Contract
 
-主线程并行派 3 个轻量 agent（Claude Code 内用 haiku），按数据源分工提炼"需求要点草稿"。**禁止编造**，未知环节标"待补充"；**禁止泄漏密钥**——素材里出现的密钥/token/密码一律脱敏或省略。
+主线程并行派 4 个轻量 agent（Claude Code 内用 haiku），按数据源分工提炼"需求要点草稿"。**禁止编造**，未知环节标"待补充"；**禁止泄漏密钥**——素材里出现的密钥/token/密码一律脱敏或省略。某数据源本次被跳过时不派对应 agent，不产出空草稿。
 
 ## Agent-CC
 - 输入：主线程过滤后的本周 CC 会话（`~/.claude/projects/**/*.jsonl` 中 timestamp 转本地后属本周的记录）
@@ -15,4 +15,9 @@
 ## Agent-Zcode
 - 输入：主线程按 SKILL.md「ZCode 会话查询」跑出的文本（起点之后的 ZCode 会话：title + 用户消息 + 工具列表）
 - 职责：同上，Write 到 `$PREFIX-zcode-draft.md`
+- 输出格式：同上
+
+## Agent-Minimax
+- 输入：主线程按 SKILL.md「MiniMax Code 会话查询」跑出的文本（起点之后的 MiniMax Code 会话：末条日期 + 文件路径 + 首条真实用户消息；深读时含全部用户消息）
+- 职责：同上，Write 到 `$PREFIX-minimax-draft.md`
 - 输出格式：同上

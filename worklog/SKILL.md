@@ -1,11 +1,11 @@
 ---
 name: worklog
-description: 记录本周做了什么（CC+Codex+ZCode 三源、主动梳理+随手记录双模式），一键生成"需求叙事"周报。触发词："记录一下"、"梳理一下最近做了什么"、"周报"、"汇报"、"产出"、"站会"。数据存 报告文档/需求/日志 与 报告文档/需求/周报。
+description: 记录本周做了什么（CC+Codex+ZCode+MiniMax Code 四源、主动梳理+随手记录双模式），一键生成"需求叙事"周报。触发词："记录一下"、"梳理一下最近做了什么"、"周报"、"汇报"、"产出"、"站会"。数据存 报告文档/需求/日志 与 报告文档/需求/周报。
 ---
 
 # worklog 工作产出记录·汇报
 
-记录本周做了什么（会话自动挖：CC/Codex/ZCode + 随手主动记），一键生成给别人看的"需求叙事"周报。纯原生工具，无脚本依赖。
+记录本周做了什么（会话自动挖：CC/Codex/ZCode/MiniMax Code + 随手主动记），一键生成给别人看的"需求叙事"周报。纯原生工具，无脚本依赖。
 
 ## 闸口铁律（最高优先级，覆盖一切执行惯性）
 
@@ -43,6 +43,18 @@ MONDAY=$(date -d "$(date +%F) -$((DOW-1)) days" +%F)   # 本周一
 
 `<周一日期>` 即 `$MONDAY`。周内任意调用都用它定位同一份文件。
 
+### 上次搜索断点
+
+模式 A 与汇报的日期范围选项「从上次搜索-现在」依赖一个断点文件：
+
+```
+报告文档/需求/.last-scan    # 一行，YYYY-MM-DD，= 上次执行会话扫描当天的日期
+```
+
+- **写入时机**：模式 A 第 2 步四源扫描完成后、汇报第 3 步四源挖完后，执行 `date +%F > 报告文档/需求/.last-scan`。只记录"扫描动作发生的日期"，与本次扫描选的范围起点无关。
+- **读取**：用户选「从上次搜索-现在」时 `$START=$(cat 报告文档/需求/.last-scan 2>/dev/null)`；文件不存在或为空 → 告知无上次搜索记录，重新展示其余选项（仍在闸口②停轮语义内）。
+- 断点按天粒度衔接：上次扫描当天的新会话会被重扫一次，由「去重」小节兜底跳过，不产生重复条目。
+
 ## 数据源
 
 | 源 | 路径 | 时间基准 |
@@ -50,6 +62,7 @@ MONDAY=$(date -d "$(date +%F) -$((DOW-1)) days" +%F)   # 本周一
 | CC | `~/.claude/projects/**/*.jsonl` | JSONL 内 `"timestamp"`（UTC） |
 | Codex | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/` 兜底 | 目录/文件名（本地时间） |
 | ZCode | `~/.zcode/cli/db/db.sqlite`（SQLite：`session`/`message`/`part` 三表） | `session.time_updated`（epoch 毫秒，绝对时间） |
+| MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | 行内 `message.timestamp`（epoch 毫秒，绝对时间） |
 
 ### 时区归一（重要，防边界日漏记录）
 - CC `timestamp` 是 UTC（如 `2026-08-12T02:00:00.000Z`，本地 UTC+8 → 08-12 10:00）。
@@ -57,10 +70,11 @@ MONDAY=$(date -d "$(date +%F) -$((DOW-1)) days" +%F)   # 本周一
 - 否则周一 00:00–07:59 落地的 UTC 记录（仍是上周日期）会被漏掉。
 - Codex 目录/文件名已是本地时间，直接比较。
 - ZCode 时间戳是 epoch 毫秒（绝对时间），无时区换算问题：起点转毫秒 `$START_MS=$(( $(date -d "$START 00:00:00" +%s) * 1000 ))` 后直接比较。
+- MiniMax Code 时间戳同为 epoch 毫秒，无换算问题，比较方式同 ZCode；**不要用目录名日期过滤**（跨天长会话会漏，须用消息内末条 timestamp 判断）。
 
 ## ZCode 会话查询（SQLite）
 
-ZCode 会话存在 SQLite 库里，**必须只读打开**（ZCode 运行时正占用该库，`mode=ro` 与 WAL 并发安全，已实测）。仓库里 `scripts/zcode_sessions.py` 是同一条查询的可执行副本（`python scripts/zcode_sessions.py <START_MS> [db]`）：
+ZCode 会话存在 SQLite 库里，**必须只读打开**（ZCode 运行时正占用该库，`mode=ro` 与 WAL 并发安全，已实测）：
 
 ```bash
 START_MS=$(( $(date -d "$START 00:00:00" +%s) * 1000 ))   # $START=起点日期 YYYY-MM-DD
@@ -89,6 +103,43 @@ EOF
 - `~/.zcode/cli/db/db.sqlite` 不存在 → 跳过该源并提示。
 - `session.title` 由 CLI 维护（`title_source` 字段），质量可靠，可直接作会话主题（不像 CC 的 thread_name 实测多为"你好"）。
 - `synthetic=1` 的 part 是系统注入（如 TodoWrite 提醒），不是真实用户输入，查询已排除。
+- 仓库里 `scripts/zcode_sessions.py` 是同一条查询的可执行副本（`python scripts/zcode_sessions.py <START_MS> [db]`），单测直接驱动它。
+
+## MiniMax Code 会话查询
+
+MiniMax Code（ZCode 系内核）会话按日期分层存 `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/`，核心是 `messages.jsonl`，每行一个消息对象：`message.role`（user/assistant）+ `message.content[]`（text 块）+ `message.timestamp`（epoch 毫秒）。扫描脚本：
+
+```bash
+START_MS=$(( $(date -d "$START 00:00:00" +%s) * 1000 ))   # $START=起点日期 YYYY-MM-DD
+python - "$START_MS" <<'EOF'
+import json, glob, os, sys, datetime
+sys.stdout.reconfigure(encoding='utf-8')   # 必须：Windows 下中文输出防 GBK 乱码
+START_MS = int(sys.argv[1])
+SKIP_PREFIX = ('<system-reminder', 'Base directory for this skill', 'This is a skill', '<background-task-finished', '[Request interrupted')
+for f in sorted(glob.glob(os.path.expanduser('~/.minimax/v2/sessions/*/*/*/*-session_*/messages.jsonl'))):
+    last_ms = 0; msgs = []
+    for line in open(f, encoding='utf-8', errors='ignore'):
+        try: o = json.loads(line)
+        except: continue
+        m = o.get('message') or {}
+        ts = m.get('timestamp')
+        if ts: last_ms = max(last_ms, ts)                      # 全文件末条，跨天会话不漏
+        if m.get('role') != 'user': continue
+        c = m.get('content', [])
+        if not isinstance(c, list): continue
+        for x in c:
+            if isinstance(x, dict) and x.get('type') == 'text':
+                t = x.get('text', '').strip()
+                if t and not t.startswith(SKIP_PREFIX): msgs.append(t)
+    if not msgs or last_ms < START_MS: continue                # msgs 空 = 纯注入会话，跳过
+    print(f"{datetime.datetime.fromtimestamp(last_ms/1000):%Y-%m-%d}  {f}  {msgs[0][:80]}")
+EOF
+```
+
+- **时间基准是消息内 `timestamp`，不是目录名日期**（目录名是会话创建时刻，跨天长会话按它过滤会漏掉末条之后的日期）。
+- `<system-reminder>`/skill 注入开头的 user 消息是系统注入不是真实输入，脚本已排除；全被排除的会话跳过。
+- `manifest.json` 有 `createdAtMs`/`updatedAtMs` 但**无标题与工作目录**，会话主题只能用首条真实用户消息。
+- `~/.minimax/` 不存在 → 跳过该源并提示。
 
 ## 记录 · 模式 B：随手记录
 
@@ -112,11 +163,14 @@ EOF
 1. **选日期范围（闸口②，硬停轮）**：展示下列选项后立即结束本轮回复，用户明确选择后再扫描：
    - A. 本周一-现在（默认）——本周已有日志时起点取日志最后一个 `## MM-DD` 节，跳过已记录项
    - B. 七天前-现在
-   - C. 自定义——向用户要起止日期
+   - C. 从上次搜索-现在——起点读「上次搜索断点」（见「上次搜索断点」小节）；无断点记录时告知用户"没有上次搜索记录"并重新展示其余选项等其选择
+   - D. 自定义——向用户要起止日期
 2. **扫最近会话**：
    - CC：`~/.claude/projects/**/*.jsonl`，按 JSONL 内 `"timestamp"`（转本地时区）筛选 ≥ 起点。
    - Codex：`~/.codex/sessions/YYYY/MM/DD/*.jsonl`（本地时间）+ `archived_sessions/` 兜底，目录/文件名日期 ≥ 起点。`~/.codex/` 不存在则跳过该源并提示。
    - ZCode：`~/.zcode/cli/db/db.sqlite` 按「ZCode 会话查询」小节执行，`time_updated >= $START_MS` 筛选。库不存在则跳过该源并提示。
+   - MiniMax Code：`~/.minimax/v2/sessions/*/*/*/*-session_*/messages.jsonl` 按「MiniMax Code 会话查询」小节执行，消息内 timestamp（epoch 毫秒）≥ `$START_MS` 筛选。目录不存在则跳过该源并提示。
+   - 四源扫完后执行「上次搜索断点」小节的写入动作。
 3. **提炼候选（仅供展示，禁止直接落盘）**：轻读每个会话的用户消息/工具调用，产出**编号**列表 `1. 日期 + 主题 + 2-3 要点`（不依赖 `session_index.jsonl` 的 thread_name，实测多为"你好"；ZCode 会话可直接用 `session.title` 作主题）。用户消息里可能贴过密钥/token/密码（实测存在），候选与落盘一律脱敏或省略，敏感串不得出现在任何输出中。
 4. **用户确认（闸口③，硬停轮，必须精确到条目）**：展示编号候选 + "要记哪几条？"（如"记 1、3"或"只记第 2 条"）后立即结束本轮回复。**用户未明确选择的条目，一律不得写入。** 回答含糊（"都行""好"）≠ 选择，必须再次询问，不得默认全选。
 5. **落盘（只写用户确认的条目）**：严格按用户确认的编号/条目，逐条按模式 B 格式追加到 `报告文档/需求/日志/$MONDAY.md`。落盘后回执："已写入 N 条：<条目列表>"；未写入的候选列出提醒（可改天再记）。
@@ -136,14 +190,15 @@ EOF
 
 1. 计算本周一 `$MONDAY`。
 2. 读 `报告文档/需求/日志/$MONDAY.md`（主动记录）。
-3. **询问日期范围（闸口②，硬停轮）**：展示 A. 本周一-现在（默认）/ B. 七天前-现在 / C. 自定义后立即结束本轮回复；用户明确选择后再按所选范围挖三源会话：CC（timestamp 转本地后属所选范围）＋ Codex（目录日期 ≥ 所选起点）＋ ZCode（db.sqlite 按「ZCode 会话查询」，`time_updated` ≥ 起点）。任一源探测不到则跳过并提示。选定后记扫描起点 `$START`（周报文件名据此）：
+3. **询问日期范围（闸口②，硬停轮）**：展示 A. 本周一-现在（默认）/ B. 七天前-现在 / C. 从上次搜索-现在（无断点记录时说明并重新展示其余选项）/ D. 自定义后立即结束本轮回复；用户明确选择后再按所选范围挖四源会话：CC（timestamp 转本地后属所选范围）＋ Codex（目录日期 ≥ 所选起点）＋ ZCode（db.sqlite 按「ZCode 会话查询」，`time_updated` ≥ 起点）＋ MiniMax Code（messages.jsonl 按「MiniMax Code 会话查询」，timestamp ≥ 起点）。任一源探测不到则跳过并提示。四源挖完后执行「上次搜索断点」小节的写入动作。选定后记扫描起点 `$START`（周报文件名据此）：
    - A → `$START=$MONDAY`
    - B → `$START=$(date -d "-6 days" +%F)`（含今天共 7 天）
-   - C → `$START=` 用户给的起始日期
-4. 并行派 3 个轻量 agent（Claude Code 内用 haiku；ZCode 内用其子代理机制。契约见 `references/agent-team-contract.md`）：Agent-CC → `md形式/$START-cc-draft.md`；Agent-Codex → `md形式/$START-codex-draft.md`；Agent-Zcode → `md形式/$START-zcode-draft.md`。
-5. 主线程合成草案（暂不落盘）：主动记录 + 三份草稿 → 按"需求叙事"模板整理出完整周报内容，附"将写入 N 条需求"的编号清单（每条一句话）。
+   - C → `$START=` 断点文件里存的日期
+   - D → `$START=` 用户给的起始日期
+4. 并行派 4 个轻量 agent（Claude Code 内用 haiku；ZCode 内用其子代理机制。契约见 `references/agent-team-contract.md`）：Agent-CC → `md形式/$START-cc-draft.md`；Agent-Codex → `md形式/$START-codex-draft.md`；Agent-Zcode → `md形式/$START-zcode-draft.md`；Agent-Minimax → `md形式/$START-minimax-draft.md`。某源本次被跳过时不派对应 agent，不产出空草稿。
+5. 主线程合成草案（暂不落盘）：主动记录 + 各源草稿 → 按"需求叙事"模板整理出完整周报内容，附"将写入 N 条需求"的编号清单（每条一句话）。
 6. **清单确认（闸口③，硬停轮）**：展示编号清单，问"全部写入，还是删掉哪几条？"后立即结束本轮回复。用户确认后才写入；点名删除的条目剔除；含糊回答必须再问，无确认不写。
-7. 写入 `报告文档/需求/周报/md形式/$START.md`，随后删除三份中间草稿（`$START-cc-draft.md`、`$START-codex-draft.md`、`$START-zcode-draft.md`），`md形式/` 只留最终周报。
+7. 写入 `报告文档/需求/周报/md形式/$START.md`，随后删除全部中间草稿（`$START-cc-draft.md`、`$START-codex-draft.md`、`$START-zcode-draft.md`、`$START-minimax-draft.md` 等本次实际产出的），`md形式/` 只留最终周报。
 8. 触发词含"站会/晨会" → 末尾附 Scrum 三问（完成/计划/阻塞）。
 
 ### 需求叙事模板
