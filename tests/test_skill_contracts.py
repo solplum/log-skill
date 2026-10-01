@@ -127,6 +127,15 @@ class PublishedSkillContractTests(unittest.TestCase):
         self.assertTrue((REPO / "worklog/test/fixtures/fake-cc-session.jsonl").is_file())
         self.assertTrue((REPO / "alllog/test/fixtures/fake-2026-08-01.md").is_file())
 
+    def test_eli5_pages_bilingual(self) -> None:
+        for skill in ("worklog", "alllog", "change-report", "changelog"):
+            zh = _read(f"eli5/{skill}.html")
+            en = _read(f"eli5/{skill}.en.html")
+            self.assertIn("中文 ｜", zh)
+            self.assertIn("English ｜", en)
+            self.assertIn(f'{skill}.en.html', zh)
+            self.assertIn(f'{skill}.html', en)
+
     def test_no_author_machine_paths(self) -> None:
         hits: list[str] = []
         for path in REPO.rglob("*"):

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · change-report — turn git changes into a manager-facing memo</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#7a4fd3; --soft:#f1ecfb; --line:#d6cbee; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI","PingFang SC",Arial,sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#655d7a; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#f4effe,#fdfcff); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#5c566e; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 You say:"; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .warn { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .warn b { color:var(--accent); }
+  .tree { font-family:Consolas,monospace; background:#233043; color:#cfe3c8; border-radius:14px; padding:20px 26px; font-size:14.5px; line-height:1.9; overflow-x:auto; }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 · change-report</span>
+  <span style="float:right;font-size:14px;color:#8a8072;">English ｜ <a href="change-report.html">中文</a></span>
+  <h1>change-report: a manager-facing memo for a git range</h1>
+  <div class="sub">"What changed here?" — it reads only git, writes in words a manager can read, and never touches your code.</div>
+
+  <div class="card analogy">
+    <b>One-line analogy:</b> worklog asks "<b>what did I do this week</b>"; change-report asks "<b>what did this code change</b>". It is a <b>note-taker who only watches the surveillance footage</b>: it opens git's commit history and diff stats, fences off one range, and writes "what changed, where, why, how it was verified" as a formal memo + Word file. It <b>never</b> commits, pushes, or resets — read-only, hands off.
+  </div>
+
+  <h2>Division of labor across the family</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">📊</div><h3>worklog</h3><p>Input = chat logs + your dictation. Output = this week's report.</p></div>
+    <div class="mini"><div class="ico">🌿</div><h3>change-report</h3><p>Input = <b>git only</b> (status / log / diff). Output = a memo for one change range.</p></div>
+    <div class="mini"><div class="ico">🗄</div><h3>alllog</h3><p>Input = full history. Output = résumé material library.</p></div>
+  </div>
+
+  <h2>Step one is always: fence the range</h2>
+  <div class="warn">
+    It <b>never</b> quietly assumes "the last 5 commits". It lists candidate ranges for you to choose: <b>uncommitted / committed-but-unpushed / pushed-but-unmerged</b>, or you can pass <code>--range</code> / <code>--commit</code> / <code>--record</code> directly. Without you naming a range, it doesn't write a word.
+  </div>
+  <div class="say">提交报告 — "commit report"</div>
+  <div class="say">这次改了什么 — "what changed here?"</div>
+  <div class="say">有哪些还没推送 — "what hasn't been pushed yet?"</div>
+
+  <h2>What the memo looks like</h2>
+  <div class="card">
+    <div class="tree"># 变更报告 Change memo · 2026-09-30
+
+## 一句话目标 One-line goal
+Finished the discover-page revamp; achieved higher click-through.
+
+## 背景 Background
+(1–2 formal sentences)
+
+## 本次改动 Changes
+**Ranking blend**
+Reason: old heat-only ranking under-exposed long-tail content
+- Discover list: heat + personalized dual-channel blend
+
+## 改动文件 Files
+(paths only, grouped by module, no code)
+
+## 验证结果 Verification
+- Local tests 24/24 passed</div>
+    <p style="color:#5c566e;font-size:14.5px;">Hard rules: no code, no line numbers, no credentials; if the "why" can't be inferred it writes 原因待确认 ("reason to be confirmed"); untested changes are marked 未验证 ("unverified") — <b>never invented</b>. At most 1–3 themes; more than that, it asks which to cut.</p>
+  </div>
+
+  <h2>Status labels only tell the truth</h2>
+  <svg viewBox="0 0 760 130" xmlns="http://www.w3.org/2000/svg">
+    <g font-size="14" text-anchor="middle">
+      <rect x="20" y="30" width="160" height="60" rx="12" fill="#fff" stroke="#d6cbee"/><text x="100" y="55" font-weight="bold">draft</text><text x="100" y="76" font-size="12" fill="#5c566e">uncommitted changes exist</text>
+      <rect x="220" y="30" width="160" height="60" rx="12" fill="#fff" stroke="#d6cbee"/><text x="300" y="55" font-weight="bold">local-commit</text><text x="300" y="76" font-size="12" fill="#5c566e">committed, not pushed</text>
+      <rect x="420" y="30" width="150" height="60" rx="12" fill="#fff" stroke="#d6cbee"/><text x="495" y="55" font-weight="bold">pushed</text><text x="495" y="76" font-size="12" fill="#5c566e">on the remote</text>
+      <rect x="610" y="30" width="130" height="60" rx="12" fill="#f1ecfb"/><text x="675" y="55" font-weight="bold">unknown</text><text x="675" y="76" font-size="12" fill="#5c566e">says so if it can't tell</text>
+      <line x1="180" y1="60" x2="216" y2="60" stroke="#7a4fd3" stroke-width="2" marker-end="url(#a)"/>
+    </g>
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7a4fd3"/></marker></defs>
+  </svg>
+  <p style="text-align:center;color:#655d7a;font-size:14px;">It will not invent a git state to make a workflow look complete.</p>
+
+  <h2>Where the output lands</h2>
+  <div class="tree">报告文档/代码/&lt;project&gt;/     (workspace "report docs / code / per project)
+├── 变更记录.md              ← running ledger, append-only, never overwritten
+├── md形式/2026-09-30.md     ← named by the range's oldest commit date
+└── word形式/2026-09-30.docx ← rendered by the docx skill</div>
+
+  <div class="foot">
+    One of the four <b>worklog-alllog</b> explainers:
+    <a href="worklog.en.html">worklog</a> ·
+    <a href="alllog.en.html">alllog</a> ·
+    <a href="change-report.en.html">change-report</a> ·
+    <a href="changelog.en.html">changelog</a>
+    ｜ <a href="change-report.html">中文版</a>
+  </div>
+</div>
+</body>
+</html>

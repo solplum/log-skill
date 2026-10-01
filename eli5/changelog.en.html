@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · changelog — a mentor handoff table of what actually changed</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#0e9488; --soft:#e6f4f2; --line:#bfe0dc; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI","PingFang SC",Arial,sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#5b6f6c; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#eafaf7,#fbfefe); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#556863; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 You say:"; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .warn { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .warn b { color:var(--accent); }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+  table.md { border-collapse:collapse; width:100%; font-size:14px; margin:10px 0; }
+  table.md th, table.md td { border:1px solid var(--line); padding:8px 12px; text-align:left; }
+  table.md th { background:var(--soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 · changelog</span>
+  <span style="float:right;font-size:14px;color:#8a8072;">English ｜ <a href="changelog.html">中文</a></span>
+  <h1>changelog: a handoff table for your mentor</h1>
+  <div class="sub">"So what did you actually change today?" — one numbered table answers it, every row backed by evidence, readable by an outsider.</div>
+
+  <div class="card analogy">
+    <b>One-line analogy:</b> change-report is a <b>note-taker who only watches git</b>; changelog is a <b>handoff secretary who hears your whole story first, then checks it against the evidence row by row</b>. It turns real changes into a "mentor handoff table": every change gets a number, stating <b>the old pain → the new behavior → how far it's delivered → how it was verified</b>, plus a file mapping section saying which file belongs to which row.
+  </div>
+
+  <h2>It always opens with two questions (every time, no guessing)</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">🎯</div><h3>① Scope: 本次 or 本功能?</h3><p>"This conversation's changes" or "this effort's whole lifecycle". The same "record my changes" legitimately means either — so it asks.</p></div>
+    <div class="mini"><div class="ico">🧬</div><h3>② Granularity: final state or per iteration?</h3><p>If a plan was replaced mid-way (v1 swapped for v2), it asks: does the table record <b>only each deliverable's final state</b>, or <b>one row per version</b>? If nothing was superseded, it skips the question.</p></div>
+  </div>
+
+  <h2>What the handoff table looks like</h2>
+  <div class="card">
+    <table class="md">
+      <tr><th>#</th><th>Change item</th><th>Original problem</th><th>What actually changed</th><th>Delivery</th><th>Verification</th></tr>
+      <tr><td>1</td><td>Login error classification</td><td>Previously every kind of login failure showed the same message — users couldn't tell a wrong password from a network outage</td><td>Now wrong password, network errors and server faults each show their own message, so users know whether to retry or change the password</td><td>Not uploaded</td><td>Local tests pass</td></tr>
+    </table>
+    <p style="color:#556863;font-size:14.5px;">Under each row there's a "files changed" section: which file, added/modified/deleted, what it contributes to that item — <b>no code dumps</b>. (Delivered reports are written in formal Chinese by default, or whichever language you ask for.)</p>
+  </div>
+
+  <h2>Three rules carved in stone</h2>
+  <div class="warn">
+    <b>1. Only what really happened.</b> Plans and "we're going to change X" from chat don't count — there must be proof: a file, a diff, a commit, a PR. If nothing provable changed, it prints exactly one line: "本次未发现已经落实的改动，不生成变更表格。" ("No implemented changes found; no table generated.")<br><br>
+    <b>2. Plain language (the readability gate).</b> For every row it asks: can someone who never read this conversation retell the change in one plain sentence? "Previously …; now …" phrasing, jargon glossed on first mention, no subject-less noun stacks. Rows that fail get rewritten before delivery — the gate is never skipped.<br><br>
+    <b>3. Three-value delivery status, no status inflation.</b> <code>未上传</code> (local only) → <code>已上传</code> (pushed) → <code>已部署</code> (live). Verification must name its environment (local / CI / cloud / production) — a local E2E pass never proves an online deployment works.
+  </div>
+
+  <h2>change-report or changelog?</h2>
+  <svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0e9488"/></marker></defs>
+    <g font-size="13" text-anchor="middle">
+      <rect x="40" y="20" width="310" height="140" rx="14" fill="#fff" stroke="#bfe0dc"/>
+      <text x="195" y="52" font-weight="bold" font-size="16">change-report</text>
+      <text x="195" y="82">Input: git only</text>
+      <text x="195" y="106">Angle: one code range</text>
+      <text x="195" y="130">Output: formal memo + Word on disk</text>
+      <rect x="410" y="20" width="310" height="140" rx="14" fill="#e6f4f2" stroke="#0e9488" stroke-width="2"/>
+      <text x="565" y="52" font-weight="bold" font-size="16">changelog</text>
+      <text x="565" y="82">Input: conversation + git + tests + cloud records</text>
+      <text x="565" y="106">Angle: change items, outsider-readable</text>
+      <text x="565" y="130">Output: handoff table (PNG on request), no disk writes by default</text>
+    </g>
+  </svg>
+
+  <h2>How to use it</h2>
+  <div class="say">/changelog</div>
+  <div class="say">记录本次改动 — "record my changes" (→ it first asks: this conversation, or the whole effort?)</div>
+  <div class="say">相比云端有哪些改动 — "what differs from the cloud?" (→ splits into local uncommitted / local-only / remote-only)</div>
+  <p>After delivering, it always asks two follow-ups: remove any rows (by number)? Export the table as a <b>PNG image</b> to share? By default it is <b>read-only</b> — it never writes CHANGELOG.md, never commits, never pushes.</p>
+
+  <div class="foot">
+    One of the four <b>worklog-alllog</b> explainers:
+    <a href="worklog.en.html">worklog</a> ·
+    <a href="alllog.en.html">alllog</a> ·
+    <a href="change-report.en.html">change-report</a> ·
+    <a href="changelog.en.html">changelog</a>
+    ｜ <a href="changelog.html">中文版</a>
+  </div>
+</div>
+</body>
+</html>

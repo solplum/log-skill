@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · alllog — mine résumé material from your AI chat history</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#2a7de1; --soft:#eaf1fa; --line:#c9d6e8; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI","PingFang SC",Arial,sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#5d6b80; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#ecf4ff,#fbfdff); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#566173; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 You say:"; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .warn { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .warn b { color:var(--accent); }
+  .tree { font-family:Consolas,monospace; background:#233043; color:#cfe3c8; border-radius:14px; padding:20px 26px; font-size:14.5px; line-height:1.9; overflow-x:auto; }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+  table.md { border-collapse:collapse; width:100%; font-size:14px; margin:10px 0; }
+  table.md th, table.md td { border:1px solid var(--line); padding:8px 12px; text-align:left; }
+  table.md th { background:var(--soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 · alllog</span>
+  <span style="float:right;font-size:14px;color:#8a8072;">English ｜ <a href="alllog.html">中文</a></span>
+  <h1>alllog: mine your chat history for résumé material</h1>
+  <div class="sub">Everything you ever did inside four AI assistants, dug back up, grouped by project, filtered down to what belongs on a résumé.</div>
+
+  <div class="card analogy">
+    <b>One-line analogy:</b> worklog is a <b>note-taker for this week</b>; alllog is <b>archiving the whole filing cabinet</b>. It goes through your <b>entire history</b> with Claude Code / Codex / ZCode / MiniMax Code, clusters it by project, extracts "what was done, with what tech, with what result", shows a numbered checklist for you to tick, and finally rolls it all into a per-project <b>résumé material library</b>.
+  </div>
+
+  <h2>How it differs from worklog</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">📅</div><h3>worklog</h3><p>Looks at <b>this week only</b>, written for your manager. One log per Monday.</p></div>
+    <div class="mini"><div class="ico">🗄</div><h3>alllog</h3><p>Looks at <b>all history</b>, for your future résumé-writing self. Accumulates daily, never cleaned up.</p></div>
+  </div>
+
+  <h2>One red line: manual wake-up only</h2>
+  <div class="warn">
+    The words "material library" or "résumé" in ordinary conversation <b>never</b> trigger alllog. You must type <code>/alllog</code> explicitly.
+    <br><br>Why? Because it sweeps your whole session history (potentially thousands of sessions) — heavy work that must never fire from a passing remark.
+  </div>
+
+  <h2>How to use it</h2>
+  <div class="say">/alllog</div>
+  <div class="say">全量梳理 — "mine everything" (résumé material)</div>
+  <div class="say">接着上次挖 — "keep going from last time" (resume from the last stop point — the most common mode)</div>
+
+  <h2>The full mining flow</h2>
+  <svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2a7de1"/></marker></defs>
+    <g font-size="13" text-anchor="middle">
+      <rect x="210" y="10" width="340" height="48" rx="10" fill="#2a7de1"/><text x="380" y="30" fill="#fff">① Pick range: all / resume / last 30 days / custom</text><text x="380" y="48" fill="#cfe0f7" font-size="11">asks, then stops for your answer</text>
+      <rect x="210" y="88" width="340" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="108">② Four-source scan (fixed scripts)</text><text x="380" y="124" fill="#566173" font-size="11">CC · Codex index · ZCode SQLite · MiniMax</text>
+      <rect x="210" y="166" width="340" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="186">③ More than 50 sessions? Cluster projects first</text><text x="380" y="202" fill="#566173" font-size="11">lists project menu, asks "which ones?" → stops</text>
+      <rect x="210" y="244" width="340" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="264">④ Deep-read the picked ones, draft numbered candidates</text><text x="380" y="280" fill="#566173" font-size="11">with a four-source coverage receipt (what was mined / missed)</text>
+      <rect x="210" y="322" width="340" height="48" rx="10" fill="#fff" stroke="#c9d6e8"/><text x="380" y="342">⑤ "Which rows?" → stops</text><text x="380" y="358" fill="#566173" font-size="11">you name 1 and 3, only 1 and 3 get written</text>
+      <rect x="210" y="392" width="340" height="42" rx="10" fill="#233043"/><text x="380" y="418" fill="#fff">Appends to 日志/ journal (append-only)</text>
+      <line x1="380" y1="58" x2="380" y2="84" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="136" x2="380" y2="162" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="214" x2="380" y2="240" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="292" x2="380" y2="318" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="380" y1="370" x2="380" y2="388" stroke="#2a7de1" stroke-width="2" marker-end="url(#a)"/>
+    </g>
+  </svg>
+
+  <h2>The coverage receipt: no silent slacking</h2>
+  <div class="card">
+    <p>Every candidate list must come with a <b>four-source statistics table</b> — a rule born from a real incident: the AI once mined only one source, silently dropped the other two, and the user had to ask "is this really all of it?" to expose it.</p>
+    <table class="md">
+      <tr><th>Source</th><th>Scanned</th><th>Included</th><th>Excluded (reasoned)</th></tr>
+      <tr><td>CC</td><td>120</td><td>86</td><td>empty shells 14 / out of range 20</td></tr>
+      <tr><td>Codex</td><td>0</td><td>0</td><td>true void in this period (must say so!)</td></tr>
+      <tr><td>ZCode</td><td>31</td><td>25</td><td>out of range 6</td></tr>
+      <tr><td>MiniMax Code</td><td>12</td><td>9</td><td>pure injections 3</td></tr>
+    </table>
+    <p style="color:#566173;font-size:14.5px;">A zero must state whether it is a <b>true void</b> (user really didn't use it then) or a <b>method failure</b> — silent shrinking is forbidden.</p>
+  </div>
+
+  <h2>Where material lives, and how it becomes a library</h2>
+  <div class="tree">$ALLLOG_DATA_ROOT/素材/          ← data root: env var, defaults to ~/alllog
+├── 日志/2026-09-29.md   ← journal: the only source of truth, append-only
+└── 整理/2026-09-29.md   ← digest snapshot (regenerated per day), read when making a résumé</div>
+  <div class="say">素材库 — "build the material library"</div>
+  <p>It reads the whole journal, groups by <code>[project]</code>, five sections per project: <b>background / tech stack / highlights / results / source entries</b>. Missing numbers are marked 待补充 ("to be filled") — invented metrics are forbidden.</p>
+
+  <div class="foot">
+    One of the four <b>worklog-alllog</b> explainers:
+    <a href="worklog.en.html">worklog</a> ·
+    <a href="alllog.en.html">alllog</a> ·
+    <a href="change-report.en.html">change-report</a> ·
+    <a href="changelog.en.html">changelog</a>
+    ｜ <a href="alllog.html">中文版</a>
+  </div>
+</div>
+</body>
+</html>

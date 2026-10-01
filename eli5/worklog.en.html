@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli5 · worklog — let AI write your weekly report</title>
+<style>
+  :root { --ink:#1a2332; --paper:#faf7f2; --accent:#e8582a; --soft:#f0e9df; --line:#d8cfc0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI","PingFang SC",Arial,sans-serif; background:var(--paper); color:var(--ink); line-height:1.7; }
+  .wrap { max-width:880px; margin:0 auto; padding:48px 24px 96px; }
+  .tag { display:inline-block; background:var(--accent); color:#fff; font-size:13px; padding:4px 14px; border-radius:999px; letter-spacing:2px; }
+  h1 { font-size:42px; margin:20px 0 8px; line-height:1.25; }
+  .sub { font-size:18px; color:#6b6257; margin-bottom:40px; }
+  h2 { font-size:26px; margin:56px 0 16px; padding-left:14px; border-left:5px solid var(--accent); }
+  p { margin:10px 0; font-size:16.5px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 2px 8px rgba(26,35,50,.05); }
+  .analogy { background:linear-gradient(135deg,#fff4ec,#fffdf9); border:2px dashed var(--accent); }
+  .analogy b { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:18px 0; }
+  .mini { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .mini .ico { font-size:30px; }
+  .mini h3 { font-size:17px; margin:8px 0 4px; }
+  .mini p { font-size:14.5px; color:#5c554b; margin:0; }
+  code { background:var(--soft); padding:2px 8px; border-radius:6px; font-size:14px; font-family:Consolas,monospace; }
+  .say { background:#233043; color:#e8edf4; border-radius:14px; padding:16px 22px; margin:14px 0; font-size:16px; }
+  .say::before { content:"🗣 You say:"; color:#8fa3bd; font-size:13px; display:block; margin-bottom:4px; }
+  .stop { border:2px solid var(--accent); background:#fff; border-radius:14px; padding:16px 22px; margin:14px 0; }
+  .stop b { color:var(--accent); }
+  .tree { font-family:Consolas,monospace; background:#233043; color:#cfe3c8; border-radius:14px; padding:20px 26px; font-size:14.5px; line-height:1.9; overflow-x:auto; }
+  .foot { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:14px; color:#8a8072; }
+  .foot a { color:var(--accent); }
+  svg { max-width:100%; height:auto; display:block; margin:12px auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ELI5 · worklog</span>
+  <span style="float:right;font-size:14px;color:#8a8072;">English ｜ <a href="worklog.html">中文</a></span>
+  <h1>worklog: let AI write your weekly report</h1>
+  <div class="sub">It watches everything you did with your four AI assistants this week and turns it into a report your manager can actually read.</div>
+
+  <div class="card analogy">
+    <b>One-line analogy:</b> you work all week, and on Friday the boss wants a weekly report. worklog is a <b>note-taking assistant sitting next to you</b> — you dictate a line, it logs a line; when you don't have time to talk, it goes through your chat history with Claude Code, Codex, ZCode and MiniMax Code, proposes a numbered list of "what you did", and only writes down the rows you point at. Then it assembles everything into a "demand narrative" weekly report.
+  </div>
+
+  <h2>It does three things</h2>
+  <div class="grid">
+    <div class="mini"><div class="ico">📝</div><h3>Quick capture (Mode B)</h3><p>You dictate one line, it appends one line to this week's log. Zero friction.</p></div>
+    <div class="mini"><div class="ico">🔍</div><h3>Mine sessions (Mode A)</h3><p>It scans the four assistants' session history, lists numbered candidates — you pick, then it writes.</p></div>
+    <div class="mini"><div class="ico">📊</div><h3>Weekly report</h3><p>Combines this week's log + four-source mining into a 背景→方案→落地→结果 (background → design → landed → result) report, with optional Word export.</p></div>
+  </div>
+
+  <h2>How to use it — just talk</h2>
+  <div class="say">记录一下：fixed the login page blank-screen bug<br><span style="color:#8fa3bd;font-size:13px;">("note this down: …" — quick capture)</span></div>
+  <div class="say">梳理一下最近做了什么<br><span style="color:#8fa3bd;font-size:13px;">("sort out what I've done recently" — mine sessions)</span></div>
+  <div class="say">周报<br><span style="color:#8fa3bd;font-size:13px;">("weekly report")</span></div>
+  <p style="color:#6b6257;font-size:14.5px;">No commands to memorize — everyday phrases work. A bare <code>/worklog</code> makes it ask which mode you want.</p>
+
+  <h2>The one rule that matters: ask first, act later</h2>
+  <div class="stop">
+    worklog has <b>hard gates</b>: whenever it shows candidates, it must <b>stop and wait for your reply</b>. You say "rows 1 and 3" — it writes exactly rows 1 and 3.
+    <br><br>Why the distrust? Because in real tests the AI "self-answers" — it says "which rows should I record?" and then continues "I'll take all of them" in the same breath, running the whole pipeline alone. <b>No confirmation = 0 rows written</b> is a hard rule baked into the skill.
+  </div>
+
+  <h2>What a report looks like</h2>
+  <div class="card">
+    <p>Every demand gets four fixed sections; missing numbers are marked 待补充 ("to be filled") — <b>never invented</b>:</p>
+    <div class="tree"># 产出汇报 Weekly report (2026-09-28 ~ 2026-10-04)
+
+## 需求 Demand: Discover-page revamp
+- **需求背景 Background**: old recommendation feed had low click-through
+- **方案 Design**: heat ranking + personalized blend
+- **落地 Landed**: new ranking live, A/B buckets in place
+- **结果 Result**: CTR +12% (or: 待补充 / to be filled)</div>
+  </div>
+
+  <h2>Where things live</h2>
+  <div class="tree">报告文档/需求/            (workspace folder "report docs / demands")
+├── 日志/2026-09-28.md      ← named by Monday, append-only, never overwritten
+└── 周报/                   ("weekly reports")
+    ├── md形式/2026-09-28.md
+    └── word形式/2026-09-28.docx</div>
+  <p style="color:#6b6257;font-size:14.5px;">The log is the ledger; the report is a snapshot — regenerating a report never touches the log.</p>
+
+  <h2>Where the data comes from</h2>
+  <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e8582a"/></marker></defs>
+    <g font-size="14" text-anchor="middle">
+      <rect x="20" y="20" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="47">Claude Code sessions</text>
+      <rect x="20" y="80" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="107">Codex sessions</text>
+      <rect x="20" y="140" width="150" height="44" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="95" y="163">ZCode + MiniMax</text>
+      <rect x="300" y="80" width="150" height="44" rx="10" fill="#e8582a"/><text x="375" y="103" fill="#fff">worklog mining</text><text x="375" y="119" fill="#fff" font-size="11">(timezone-normalized)</text>
+      <rect x="560" y="42" width="170" height="52" rx="10" fill="#fff" stroke="#d8cfc0"/><text x="645" y="64">Numbered candidates</text><text x="645" y="82" font-size="12">→ stops, waits for your pick</text>
+      <rect x="560" y="126" width="170" height="52" rx="10" fill="#233043"/><text x="645" y="148" fill="#fff">Weekly report</text><text x="645" y="166" fill="#aab8cc" font-size="12">md + Word</text>
+      <line x1="170" y1="42" x2="296" y2="92" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="170" y1="102" x2="296" y2="102" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="170" y1="162" x2="296" y2="112" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="450" y1="95" x2="556" y2="72" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+      <line x1="645" y1="94" x2="645" y2="122" stroke="#e8582a" stroke-width="2" marker-end="url(#a)"/>
+    </g>
+  </svg>
+  <p style="text-align:center;color:#6b6257;font-size:14px;">Your dictated notes + four assistants' history → candidate list (you pick) → weekly report</p>
+
+  <div class="foot">
+    One of the four <b>worklog-alllog</b> explainers:
+    <a href="worklog.en.html">worklog</a> ·
+    <a href="alllog.en.html">alllog</a> ·
+    <a href="change-report.en.html">change-report</a> ·
+    <a href="changelog.en.html">changelog</a>
+    ｜ <a href="worklog.html">中文版</a>
+  </div>
+</div>
+</body>
+</html>
