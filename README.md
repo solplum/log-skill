@@ -15,14 +15,14 @@ They are instruction skills (`SKILL.md` + references + fixtures). There is no se
 
 They never share files. worklog writes under your workspace `报告文档/需求/`. change-report writes under workspace `报告文档/代码/<project>/`. alllog writes under a **user-configurable** data root (`ALLLOG_DATA_ROOT`, default `~/alllog`). changelog prints to the conversation and only writes anything (a PNG) if you ask for the export.
 
-**Prefer pictures over prose?** Each skill has a dedicated ELI5 explainer page, in both Chinese and English:
+**Prefer pictures over prose?** Each skill has a dedicated ELI5 explainer page, in both Chinese and English — the links below go to the rendered pages served by **GitHub Pages**. (The `eli5/*.html` files in the repo are the same sources; GitHub's file view shows HTML as code, not as a page.)
 
 | Explainer | Skill | What it covers |
 | --- | --- | --- |
-| [中文](eli5/worklog.html) · [English](eli5/worklog.en.html) | worklog | four-source mining → numbered candidates → gate confirmation → demand-narrative weekly report |
-| [中文](eli5/alllog.html) · [English](eli5/alllog.en.html) | alllog | full-history résumé mining, coverage receipt, journal/digest layout |
-| [中文](eli5/change-report.html) · [English](eli5/change-report.en.html) | change-report | pick a range → formal memo, read-only git, honest status labels |
-| [中文](eli5/changelog.html) · [English](eli5/changelog.en.html) | changelog | 本次 vs 本功能 scope, final-state vs per-iteration, readability gate, three-value delivery status |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/worklog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/worklog.en.html) | worklog | four-source mining → numbered candidates → gate confirmation → demand-narrative weekly report |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/alllog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/alllog.en.html) | alllog | full-history résumé mining, coverage receipt, journal/digest layout |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/change-report.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/change-report.en.html) | change-report | pick a range → formal memo, read-only git, honest status labels |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/changelog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/changelog.en.html) | changelog | 本次 vs 本功能 scope, final-state vs per-iteration, readability gate, three-value delivery status |
 
 ---
 
@@ -555,14 +555,14 @@ MIT. See [LICENSE](./LICENSE).
 
 四者文件互不干扰。worklog 写在 `报告文档/需求/`；change-report 写在 `报告文档/代码/<项目>/`；alllog 写在你自己配置的数据根（环境变量 `ALLLOG_DATA_ROOT`，默认 `~/alllog`）；changelog 默认只输出在对话里，仅在你要求时导出 PNG。
 
-**看文字嫌累？** 每个技能配了中英双语的大白话讲解页：
+**看文字嫌累？** 每个技能配了中英双语的大白话讲解页——下面的链接直达 **GitHub Pages** 渲染版（仓库里的 `eli5/*.html` 是同一批源文件；GitHub 的文件页对 HTML 只显示源码不渲染，别从那里点）：
 
 | 讲解页 | 技能 | 讲什么 |
 | --- | --- | --- |
-| [中文](eli5/worklog.html) · [English](eli5/worklog.en.html) | worklog | 四源挖掘 → 候选清单 → 闸口确认 → 需求叙事周报 |
-| [中文](eli5/alllog.html) · [English](eli5/alllog.en.html) | alllog | 全量挖简历素材、覆盖度回执、日志/整理双层布局 |
-| [中文](eli5/change-report.html) · [English](eli5/change-report.en.html) | change-report | 圈范围 → 正式备忘、只读 git、诚实状态标记 |
-| [中文](eli5/changelog.html) · [English](eli5/changelog.en.html) | changelog | 本次 vs 本功能、终态 vs 迭代、可读性闸门、交付状态三值 |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/worklog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/worklog.en.html) | worklog | 四源挖掘 → 候选清单 → 闸口确认 → 需求叙事周报 |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/alllog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/alllog.en.html) | alllog | 全量挖简历素材、覆盖度回执、日志/整理双层布局 |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/change-report.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/change-report.en.html) | change-report | 圈范围 → 正式备忘、只读 git、诚实状态标记 |
+| [中文](https://2021291696.github.io/worklog-alllog/eli5/changelog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/changelog.en.html) | changelog | 本次 vs 本功能、终态 vs 迭代、可读性闸门、交付状态三值 |
 
 ---
 
