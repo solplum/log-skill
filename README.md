@@ -1,5 +1,7 @@
 # worklog + alllog + change-report + changelog
 
+🌐 **English** ｜ **[中文说明（直达中文版 README）](#worklog--alllog--change-report--changelog中文)**
+
 Four complementary agent skills for [Claude Code](https://claude.ai) / [Codex](https://github.com/openai/codex) / ZCode-style CLIs. Two of them read your local coding-agent session history (`worklog`, `alllog`). One reads **git history only** (`change-report`). The fourth (`changelog`) turns what actually changed — proven by files, diffs, commits, tests, or cloud records — into a numbered handoff table a mentor can read without reading your conversation.
 
 They are instruction skills (`SKILL.md` + references + fixtures). There is no server to run. Copy a skill folder into your agent's skills directory and the agent follows the file when you invoke it.
@@ -38,6 +40,7 @@ They never share files. worklog writes under your workspace `报告文档/需求
 - [Repository layout](#repository-layout)
 - [Tests](#tests)
 - [License](#license)
+- [中文说明（Chinese README）](#worklog--alllog--change-report--changelog中文)
 
 ---
 
@@ -77,6 +80,8 @@ change-report answers "what did this git range change, in language a manager can
 
 Status labels are honest: `draft` (dirty tree), `local-commit`, `pushed`, or `unknown`. The skill will not invent a git state to make a workflow look complete.
 
+It is also **composable and resumable** — the V3 execution model, which outranks any conflicting rule in the skill: you may invoke it before a commit, before a push, after a push, or retroactively to backfill a record; there is no required order. Re-invoking the same range shows or updates the markdown draft and re-renders it; the md source stays in `md形式/`. An optional local state index may record `reported` and the output paths, but neither the index nor the report content is ever auto-committed or auto-pushed.
+
 ### changelog — mentor handoff table
 
 changelog answers "what actually changed — and can a mentor who skipped this conversation understand each row?" It reads the **conversation plus the smallest relevant evidence set** (files, git, commits, PRs, tests, CI, cloud records, runtime logs — routed by intent, see `changelog/references/evidence-routing.md`).
@@ -85,7 +90,7 @@ changelog answers "what actually changed — and can a mentor who skipped this c
 2. **Granularity gate** when the scope contains superseded iterations: final-state-only rows, or one row per iteration.
 3. Build a **numbered main table** — 改动事项 / 原背景 / 本次实际改动 / 交付状态 / 验证结果 — then a per-item file mapping section with the same numbers.
 4. **Readability gate (hard):** every row must be retellable in one plain sentence by someone who did not read the conversation ("以前…；现在…" style, jargon glossed). Rewritten before delivery, never skipped.
-5. **Delivery status has exactly three values:** 未上传 (local only) → 已上传 (pushed) → 已部署 (live). Validation must name its environment (本地 / CI / 云端 / 线上) — a local E2E pass never backs an online deployment.
+5. **Delivery status has exactly three values:** 未上传 (local only) → 已上传 (pushed) → 已部署 (live). Validation must name its environment (本地 / CI / 云端 / 线上) — a local E2E pass never backs an online deployment. When deployment depends on a third party rebuilding, the row stays 已上传 and the report appends one 部署说明 line naming who must pull which branch and rebuild before it goes live.
 6. After delivering, end with one closing question: remove any items (by number) and/or export the table as a PNG.
 
 Proof rule: a plan, a suggestion, or a discussion-only decision is never an item. If nothing provable changed, the skill prints exactly `本次未发现已经落实的改动，不生成变更表格。` and emits no empty table.
@@ -99,7 +104,7 @@ Proof rule: a plan, a suggestion, or a discussion-only decision is never an item
 | Audience | Manager / standup / weekly review | Future you writing a résumé | Manager / "what shipped in this diff" | Mentor receiving a handoff |
 | Input | Agent session logs + your notes | Agent session logs + your notes | **Git only** (`status` / `log` / `diff`) | Conversation + smallest relevant evidence (git / PR / tests / CI / cloud) |
 | Who may start it | Everyday phrases or `/worklog` | Only `/alllog` / an explicit name | Everyday phrases or `/change-report` | `/changelog` or everyday phrases |
-| Time grain | This week (Monday-based file name) | All time (today's date on each journal file) | One git range (oldest commit date) | 本次 conversation or 本功能 lifecycle — asked, never guessed |
+| Time grain | This week (Monday-based file name) | All time (today's date on each journal file) | One git range (oldest commit date) | This conversation or the effort's full lifecycle (本次 / 本功能) — asked, never guessed |
 | Dedup | Same `[需求名]` tag in **this week's** log is skipped | Same project **and** same point across **all** journal files is skipped | Same theme in that project's `变更记录.md` is skipped | Evidence decides: no record, no row |
 | Output shape | One demand: 背景 / 方案 / 落地 / 结果 | One project: 背景 / 技术栈 / 亮点 / 结果 / 素材记录 | One memo: 一句话目标 / 背景 / 本次改动 / 改动文件 / 验证结果 | Numbered table: 改动事项 / 原背景 / 本次实际改动 / 交付状态 / 验证结果 + file sections |
 | Persistence | Workspace `报告文档/需求/` | `$ALLLOG_DATA_ROOT` (default `~/alllog`) | Workspace `报告文档/代码/<project>/` | Conversation only; optional PNG export |
@@ -187,7 +192,7 @@ If you skip this, alllog uses `~/alllog` (`%USERPROFILE%\alllog` on Windows).
 
 | You type | Mode |
 | --- | --- |
-| `/alllog` with no extra words | Gate ① — agent asks: one line / mine material / build the digest? |
+| `/alllog` with no extra words | Gate ① — agent asks: one line / mine material / roll up the library? |
 | `全量记一下：…` / `记简历：…` | Mode B — quick capture |
 | `全量梳理` / `挖简历素材` | Mode A — mine sessions |
 | `接着上次挖` / `从上次停的地方继续` | Mode A with "resume from last stop point" pre-selected |
@@ -235,7 +240,7 @@ Never overwrite an older bullet.
 
 ### worklog Mode A — mine recent work
 
-1. **Gate ②:** this Monday–now / last 7 days / **from last scan** (reads the `.last-scan` checkpoint; if absent, says so and re-offers the other options) / custom range. Ask, then stop.
+1. **Gate ②:** this Monday–now (default; if this week's log already exists, the start resumes from its last `## MM-DD` section so recorded items are skipped) / last 7 days / **from last scan** (reads the `.last-scan` checkpoint; if absent, says so and re-offers the other options) / custom range. Ask, then stop.
 2. Scan all four sources (skip a missing one with a note). After scanning, write today's date into `报告文档/需求/.last-scan`.
 3. Show a **numbered** candidate list. Do not write yet. Redact any tokens or passwords found in user messages.
 4. **Gate ③:** "which rows?" Ask, then stop.
@@ -244,8 +249,8 @@ Never overwrite an older bullet.
 ### worklog report
 
 1. Read this week's log.
-2. **Gate ②** for the scan window (same four choices; the start date becomes the report file name).
-3. Optionally spawn up to four light agents (see `worklog/references/agent-team-contract.md`), one per source. A skipped source spawns no agent.
+2. **Gate ②** for the scan window (same four choices; the start date becomes the report file name). After mining the four sources, update the `.last-scan` checkpoint.
+3. Spawn up to four light agents in parallel — one per available source (see `worklog/references/agent-team-contract.md`). A skipped source spawns no agent and produces no empty draft.
 4. Draft the demand-narrative report. **Gate ③:** show the numbered demand list, ask which to keep, then stop.
 5. Write `报告文档/需求/周报/md形式/<start>.md` and delete all intermediate drafts (`<start>-cc-draft.md`, `-codex-`, `-zcode-`, `-minimax-`).
 6. Offer Word export to `报告文档/需求/周报/word形式/<start>.docx` if a docx skill exists.
@@ -272,14 +277,14 @@ Template:
 
 1. **Gate ②:** all sessions / **resume from last stop point** (newest journal file name + 1 day; empty journal falls back to "all") / last 30 days / custom. Ask, then stop.
 2. Scan all four sources with the exact scripts embedded in `alllog/SKILL.md` (CC session scan, Codex index-first, ZCode SQLite read-only, MiniMax Code messages.jsonl). Keep exclusion counts for the receipt.
-3. **Gate ③:** if the **combined** four-source session count exceeds 50 (or you chose "all"), cluster by `directory` first and ask which projects. Ask, then stop. Do not default to "all projects." The count must be the four-source total, never one source alone.
+3. **Gate ③:** if the **combined** four-source session count exceeds 50 (or you chose "all"), cluster by `directory` first and ask which projects. Ask, then stop. Do not default to "all projects." The count must be the four-source total, never one source alone. MiniMax Code sessions carry no `directory` — cluster them into projects by topic keywords instead.
 4. Rank bullets for a résumé: measurable result > hard technical win > architecture call > routine fix. Attach the **coverage receipt** (four-source scanned/included/excluded table; a zero must say whether it is a true void or a method failure).
 5. **Gate ④:** numbered list, "which rows?" Ask, then stop.
 6. Append only the rows you named to `素材/日志/`.
 
 ### alllog rollup
 
-Read every `素材/日志/*.md` (the journal is the only source of truth), group by `[项目名]`, and write `$ALLLOG_DATA_ROOT/素材/整理/<today>.md` (today's digest; same-day regeneration overwrites, the journal is never touched). If the journal is empty, tell you to capture or mine first.
+Read every `素材/日志/*.md` (the journal is the only source of truth), group by `[项目名]`, and write `$ALLLOG_DATA_ROOT/素材/整理/<today>.md` (today's digest; same-day regeneration overwrites, the journal is never touched). If the journal is empty, tell you to capture or mine first. After writing, report the project count, the entry count and the file path, and note that résumé-making only needs this newest digest.
 
 ```markdown
 # 简历素材库（生成于 <YYYY-MM-DD HH:MM>，共 <N> 项目 <M> 条）
@@ -301,7 +306,7 @@ Read every `素材/日志/*.md` (the journal is the only source of truth), group
 4. Optionally read `docs/change-log.md`.
 5. Draft from `git diff --stat`, selected file diffs, and `git log <trunk>..HEAD`. Missing "why" → `原因待确认`. Missing tests → `未验证`. Never invent either.
 6. **Gate ②:** show the draft, ask you to confirm / fill in the reasons. Ask, then stop.
-7. Append to `变更记录.md` (append-only). Write `md形式/<range-start>.md`. Ask a `docx` skill for `word形式/<range-start>.docx`. Keep the markdown source.
+7. Append to `变更记录.md` (append-only). Write `md形式/<range-start>.md`. Ask a `docx` skill for `word形式/<range-start>.docx`. Keep the markdown source; if rendering fails, say so and leave the md for a manual retry. Finish by reporting the .docx path plus a short digest (one-line goal + theme list).
 
 `<range-start>` is `git show -s --format=%cs <oldest-in-range>`. Uncommitted-only ranges use today. If the target file already exists, confirm before overwrite.
 
@@ -333,6 +338,8 @@ Rules the skill will not bend:
 - File/place + change + effect only. **No code, line numbers, or commands** in the report.
 - No credentials, tokens, or internal addresses.
 - At most 1–3 themes. More than that → ask to merge or cut.
+- One page of prose; every line ≤ 25 characters; sub-points ordered by dependency chain (design/DB → backend → frontend).
+- The file list comes from `git diff --name-only <trunk>..HEAD`, grouped by module — paths only, one per line.
 
 ### changelog — mentor handoff table
 
@@ -440,8 +447,9 @@ worklog and alllog read the same four local stores. A missing store is skipped w
 
 | Source | Path | Clock |
 | --- | --- | --- |
-| Claude Code (CC) | `~/.claude/projects/**/*.jsonl` | `"timestamp"` in the JSONL, **UTC**; date a session by its **last** timestamp so multi-day sessions are not dropped |
-| Codex | `~/.codex/session_index.jsonl` (preferred: thread name + `updated_at`), falling back to `~/.codex/sessions/YYYY/MM/DD/*.jsonl` plus `archived_sessions/` (flat, top level) | index `updated_at`, **UTC**; file names, **local** |
+| Claude Code (CC) | `~/.claude/projects/**/*.jsonl` | `"timestamp"` in the JSONL, **UTC**. alllog dates a whole session by its **last** timestamp (multi-day sessions are not dropped); worklog filters individual records |
+| Codex — alllog | `~/.codex/session_index.jsonl` preferred (thread name + `updated_at`), folder scan as fallback | index `updated_at`, **UTC** |
+| Codex — worklog | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/` (flat, top level). **Does not read the index** — in real runs its `thread_name` is usually a useless "你好" | file/folder names, **local** |
 | ZCode | `~/.zcode/cli/db/db.sqlite` (`session` / `message` / `part`) | `session.time_updated`, epoch **milliseconds** |
 | MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | last `message.timestamp` in the file, epoch **milliseconds** — never the folder date |
 
@@ -532,6 +540,8 @@ MIT. See [LICENSE](./LICENSE).
 
 # worklog + alllog + change-report + changelog（中文）
 
+🌐 **[↑ English（回到英文版顶部）](#worklog--alllog--change-report--changelog)** ｜ **中文**
+
 四个互补的 Claude Code / Codex / ZCode 系 agent 技能：从本机会话里整理**给别人看的周报**（worklog）和**给简历用的项目素材**（alllog）；只读 git 的**给上级看的变更备忘**（change-report）；以及把实际改动整理成**带序号 Mentor 交接表**的 changelog。
 
 它们是 `SKILL.md` 指令技能，没有后台服务。把技能目录拷进 agent 的 skills 文件夹后，用对应斜杠命令即可。
@@ -556,15 +566,32 @@ MIT. See [LICENSE](./LICENSE).
 
 ---
 
+## 目录
+
+- [各自是什么](#各自是什么)
+- [四者差别](#四者差别)
+- [安装](#安装)
+- [斜杠命令与触发词](#斜杠命令与触发词)
+- [模式说明](#模式说明)
+- [确认闸口](#确认闸口)
+- [存储布局](#存储布局)
+- [会话数据源与时区](#会话数据源与时区)
+- [限制](#限制)
+- [仓库结构](#仓库结构)
+- [测试](#测试)
+- [许可](#许可)
+
+---
+
 ## 各自是什么
 
 **worklog** 回答「这周交差写什么」。三种用法：你口述一句就记（随手记）；扫描 CC / Codex / ZCode / MiniMax Code 四源会话，列出编号候选，你点名才写入（主动梳理，支持「从上次搜索-现在」断点续扫）；把本周日志收成「需求背景 / 方案 / 落地 / 结果」周报，需要的话再导出 Word，汇报时可并行派最多 4 个轻量 agent 分源提炼。日志只追加；重跑周报只动 `周报/`，不动 `日志/`。
 
 **alllog** 回答「哪些能写进简历」。三种用法：口述一条项目素材；挖历史会话（量大先按目录聚项目，每次候选必附**四源覆盖度回执**，杜绝静默漏挖）；把 `素材/日志/` 全量汇总成按项目归组的 `素材/整理/<当天>.md` 快照。对话里出现「素材库」「记简历」**不得**自动启动本技能，必须先打 `/alllog`。
 
-**change-report** 回答「这段 git 改动，给上级怎么写」。只读 `git status` / `log` / `diff`，绝不 commit / push / reset。先圈范围（未提交 / 未推送 / 已推送未合并，或 `--record` / `--range` / `--commit`），起草正式备忘，你确认「为什么」之后才落 `变更记录.md` + md 报告，再委托 `docx` skill 出 Word。推断不出原因就标「原因待确认」，没跑测试就标「未验证」，绝不编造。
+**change-report** 回答「这段 git 改动，给上级怎么写」。只读 `git status` / `log` / `diff`，绝不 commit / push / reset。先圈范围（未提交 / 未推送 / 已推送未合并，或 `--record` / `--range` / `--commit`），起草正式备忘，你确认「为什么」之后才落 `变更记录.md` + md 报告，再委托 `docx` skill 出 Word。推断不出原因就标「原因待确认」，没跑测试就标「未验证」，绝不编造。它还是**可组合、可恢复**的（V3 执行模型，优先于技能内任何冲突规则）：commit 前 / push 前 / push 后 / 补记都能调用，没有规定顺序；重复调用同一范围默认展示或更新 md 草稿再重渲染，md 源保留在 `md形式/`；可选的本地状态索引可记 `reported` 与输出路径，但索引和报告内容都绝不自动 commit / push。
 
-**changelog** 回答「实际改了什么，导师没看对话能不能看懂每一行」。每次必问范围（**本次**会话的实际改动 vs **本功能**全周期）、有被替代的迭代时再问粒度（只记终态 vs 逐版各一行），按 `changelog/references/evidence-routing.md` 路由到最小证据集（对话定范围和理由；文件、git、PR、测试、CI、云端记录只在请求涉及时才看——聊天里说改了不算改，必须有记录）。产出编号主表（改动事项 / 原背景 / 本次实际改动 / 交付状态 / 验证结果）+ 每条对应的「具体改动文件」小节；交付前逐行过**可读性闸门**（没读过对话的人一句白话能复述）；交付状态只有 `未上传 → 已上传 → 已部署` 三值，验证结果必须写明来自哪个环境（本地 / CI / 云端 / 线上）。交付后固定追问：删改哪几条、要不要把表格导出成图片。查无实据时只输出一句「本次未发现已经落实的改动，不生成变更表格」，绝不生成空表。
+**changelog** 回答「实际改了什么，导师没看对话能不能看懂每一行」。每次必问范围（**本次**会话的实际改动 vs **本功能**全周期）、有被替代的迭代时再问粒度（只记终态 vs 逐版各一行），按 `changelog/references/evidence-routing.md` 路由到最小证据集（对话定范围和理由；文件、git、PR、测试、CI、云端记录只在请求涉及时才看——聊天里说改了不算改，必须有记录）。产出编号主表（改动事项 / 原背景 / 本次实际改动 / 交付状态 / 验证结果）+ 每条对应的「具体改动文件」小节；交付前逐行过**可读性闸门**（没读过对话的人一句白话能复述）；交付状态只有 `未上传 → 已上传 → 已部署` 三值，验证结果必须写明来自哪个环境（本地 / CI / 云端 / 线上）；部署依赖第三方拉取重建时保持 `已上传` 并附一行「部署说明」（谁拉哪个分支重建后才在线上生效）。交付后固定追问：删改哪几条、要不要把表格导出成图片。查无实据时只输出一句「本次未发现已经落实的改动，不生成变更表格」，绝不生成空表。
 
 ---
 
@@ -691,7 +718,7 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 ### worklog 周报
 
 1. 读本周日志。
-2. **闸口②**选范围（同上四项；起点即周报文件名）。
+2. **闸口②**选范围（同上四项；起点即周报文件名）。四源挖完后同样更新 `.last-scan` 断点。
 3. 按需并行派最多 4 个轻量 agent（Agent-CC / Agent-Codex / Agent-Zcode / Agent-Minimax，契约见 `worklog/references/agent-team-contract.md`）。某源跳过就不派、不出空草稿。
 4. 合成需求叙事草案。**闸口③**列编号清单问「全写还是删哪几条」。
 5. 写 `周报/md形式/<起点>.md`，删除全部中间草稿（`-cc-` / `-codex-` / `-zcode-` / `-minimax-`）。
@@ -726,7 +753,7 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 
 ### alllog 汇总
 
-读 `素材/日志/*.md` 全量（日志是唯一事实底账），按 `[项目名]` 归组，写 `$ALLLOG_DATA_ROOT/素材/整理/<今天>.md`（同日重生成覆盖，绝不动日志）。日志为空则提示先记先挖。
+读 `素材/日志/*.md` 全量（日志是唯一事实底账），按 `[项目名]` 归组，写 `$ALLLOG_DATA_ROOT/素材/整理/<今天>.md`（同日重生成覆盖，绝不动日志）。日志为空则提示先记先挖。生成后回执项目数、素材条数、文件路径，并注明「制作简历只需读这份最新整理快照」。
 
 模板（五段：背景 / 技术栈 / 亮点/难点 / 结果/量化 / 素材记录）见上方英文节。
 
@@ -738,11 +765,11 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 4. 可读 `docs/change-log.md` 补背景。
 5. 从 `git diff --stat`、选中文件 diff、`git log <主干>..HEAD` 起草。缺「为什么」标 `原因待确认`，没测试标 `未验证`。
 6. **闸口②**给你确认/补原因，问完即停。
-7. 追加 `变更记录.md`（只追加）→ 写 `md形式/<范围起点>.md` → 委托 docx skill 出 Word，md 源保留。
+7. 追加 `变更记录.md`（只追加）→ 写 `md形式/<范围起点>.md` → 委托 docx skill 出 Word，md 源保留；渲染失败要说明并保留 md 供手动重试。最后回执 .docx 路径 + 简要摘要（一句话目标 + 大点列表）。
 
 `<范围起点>` = 范围内最旧 commit 的 `%cs` 日期；纯未提交改动用今天；目标文件已存在先确认覆盖。
 
-硬规矩：正式书面语；只写 文件/位置 + 改动 + 效果，**报告里不出现代码、行号、命令**；不带任何凭据与内网地址；主题最多 1–3 个，超了问你怎么砍。
+硬规矩：正式书面语；只写 文件/位置 + 改动 + 效果，**报告里不出现代码、行号、命令**；不带任何凭据与内网地址；主题最多 1–3 个，超了问你怎么砍；正文一页以内、每行 ≤ 25 字；小点按依赖链排序（设计/数据库 → 后端 → 前端）；改动文件清单取自 `git diff --name-only <主干>..HEAD`，按模块分组、每行一个路径。
 
 ### changelog——Mentor 交接表
 
@@ -846,8 +873,9 @@ worklog 和 alllog 读同一批本地存储，缺哪个源跳过并提示。chan
 
 | 源 | 路径 | 时间基准 |
 | --- | --- | --- |
-| Claude Code（CC） | `~/.claude/projects/**/*.jsonl` | JSONL 内 `"timestamp"`，**UTC**；会话日期取**末条** timestamp（跨天会话不漏） |
-| Codex | `~/.codex/session_index.jsonl`（首选：thread 名 + `updated_at`），退化扫 `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/`（顶层平铺） | 索引 `updated_at` 是 **UTC**；文件名内嵌**本地**时间 |
+| Claude Code（CC） | `~/.claude/projects/**/*.jsonl` | JSONL 内 `"timestamp"`，**UTC**；alllog 以**末条** timestamp 定会话日期（跨天会话不漏），worklog 按单条记录过滤 |
+| Codex——alllog | `~/.codex/session_index.jsonl` 首选（thread 名 + `updated_at`），目录扫描兜底 | 索引 `updated_at` 是 **UTC** |
+| Codex——worklog | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/`（顶层平铺）；**不读索引**——实测索引 thread_name 多为「你好」 | 目录/文件名内嵌**本地**时间 |
 | ZCode | `~/.zcode/cli/db/db.sqlite`（`session` / `message` / `part` 三表） | `session.time_updated`，epoch **毫秒** |
 | MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | 文件内末条 `message.timestamp`，epoch **毫秒**——禁用目录名日期过滤 |
 
