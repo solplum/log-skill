@@ -19,10 +19,10 @@ They never share files. worklog writes under your workspace `报告文档/需求
 
 | Explainer | Skill | What it covers |
 | --- | --- | --- |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/worklog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/worklog.en.html) | worklog | four-source mining → numbered candidates → gate confirmation → demand-narrative weekly report |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/alllog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/alllog.en.html) | alllog | full-history résumé mining, coverage receipt, journal/digest layout |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/change-report.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/change-report.en.html) | change-report | pick a range → formal memo, read-only git, honest status labels |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/changelog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/changelog.en.html) | changelog | 本次 vs 本功能 scope, final-state vs per-iteration, readability gate, three-value delivery status |
+| [中文](https://solplum.github.io/log-skill/eli5/worklog.html) · [English](https://solplum.github.io/log-skill/eli5/worklog.en.html) | worklog | four-source mining → numbered candidates → gate confirmation → demand-narrative weekly report |
+| [中文](https://solplum.github.io/log-skill/eli5/alllog.html) · [English](https://solplum.github.io/log-skill/eli5/alllog.en.html) | alllog | full-history résumé mining, coverage receipt, journal/digest layout |
+| [中文](https://solplum.github.io/log-skill/eli5/change-report.html) · [English](https://solplum.github.io/log-skill/eli5/change-report.en.html) | change-report | pick a range → formal memo, read-only git, honest status labels |
+| [中文](https://solplum.github.io/log-skill/eli5/changelog.html) · [English](https://solplum.github.io/log-skill/eli5/changelog.en.html) | changelog | 本次 vs 本功能 scope, final-state vs per-iteration, readability gate, three-value delivery status |
 
 ---
 
@@ -120,45 +120,45 @@ Clone this repository, then **copy each skill directory** into the skills folder
 ### Claude Code
 
 ```bash
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
-cp -R worklog-alllog/worklog        ~/.claude/skills/worklog
-cp -R worklog-alllog/alllog         ~/.claude/skills/alllog
-cp -R worklog-alllog/change-report  ~/.claude/skills/change-report
-cp -R worklog-alllog/changelog      ~/.claude/skills/changelog
+cp -R log-skill/worklog        ~/.claude/skills/worklog
+cp -R log-skill/alllog         ~/.claude/skills/alllog
+cp -R log-skill/change-report  ~/.claude/skills/change-report
+cp -R log-skill/changelog      ~/.claude/skills/changelog
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null
-Copy-Item -Recurse -Force worklog-alllog\worklog       "$env:USERPROFILE\.claude\skills\worklog"
-Copy-Item -Recurse -Force worklog-alllog\alllog        "$env:USERPROFILE\.claude\skills\alllog"
-Copy-Item -Recurse -Force worklog-alllog\change-report "$env:USERPROFILE\.claude\skills\change-report"
-Copy-Item -Recurse -Force worklog-alllog\changelog     "$env:USERPROFILE\.claude\skills\changelog"
+Copy-Item -Recurse -Force log-skill\worklog       "$env:USERPROFILE\.claude\skills\worklog"
+Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.claude\skills\alllog"
+Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.claude\skills\change-report"
+Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.claude\skills\changelog"
 ```
 
 ### Codex
 
 ```bash
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
-cp -R worklog-alllog/worklog        ~/.codex/skills/worklog
-cp -R worklog-alllog/alllog         ~/.codex/skills/alllog
-cp -R worklog-alllog/change-report  ~/.codex/skills/change-report
-cp -R worklog-alllog/changelog      ~/.codex/skills/changelog
+cp -R log-skill/worklog        ~/.codex/skills/worklog
+cp -R log-skill/alllog         ~/.codex/skills/alllog
+cp -R log-skill/change-report  ~/.codex/skills/change-report
+cp -R log-skill/changelog      ~/.codex/skills/changelog
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex\skills" | Out-Null
-Copy-Item -Recurse -Force worklog-alllog\worklog       "$env:USERPROFILE\.codex\skills\worklog"
-Copy-Item -Recurse -Force worklog-alllog\alllog        "$env:USERPROFILE\.codex\skills\alllog"
-Copy-Item -Recurse -Force worklog-alllog\change-report "$env:USERPROFILE\.codex\skills\change-report"
-Copy-Item -Recurse -Force worklog-alllog\changelog     "$env:USERPROFILE\.codex\skills\changelog"
+Copy-Item -Recurse -Force log-skill\worklog       "$env:USERPROFILE\.codex\skills\worklog"
+Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.codex\skills\alllog"
+Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.codex\skills\change-report"
+Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.codex\skills\changelog"
 ```
 
 Restart the CLI after copying so it reloads skills.
@@ -559,10 +559,10 @@ MIT. See [LICENSE](./LICENSE).
 
 | 讲解页 | 技能 | 讲什么 |
 | --- | --- | --- |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/worklog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/worklog.en.html) | worklog | 四源挖掘 → 候选清单 → 闸口确认 → 需求叙事周报 |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/alllog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/alllog.en.html) | alllog | 全量挖简历素材、覆盖度回执、日志/整理双层布局 |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/change-report.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/change-report.en.html) | change-report | 圈范围 → 正式备忘、只读 git、诚实状态标记 |
-| [中文](https://2021291696.github.io/worklog-alllog/eli5/changelog.html) · [English](https://2021291696.github.io/worklog-alllog/eli5/changelog.en.html) | changelog | 本次 vs 本功能、终态 vs 迭代、可读性闸门、交付状态三值 |
+| [中文](https://solplum.github.io/log-skill/eli5/worklog.html) · [English](https://solplum.github.io/log-skill/eli5/worklog.en.html) | worklog | 四源挖掘 → 候选清单 → 闸口确认 → 需求叙事周报 |
+| [中文](https://solplum.github.io/log-skill/eli5/alllog.html) · [English](https://solplum.github.io/log-skill/eli5/alllog.en.html) | alllog | 全量挖简历素材、覆盖度回执、日志/整理双层布局 |
+| [中文](https://solplum.github.io/log-skill/eli5/change-report.html) · [English](https://solplum.github.io/log-skill/eli5/change-report.en.html) | change-report | 圈范围 → 正式备忘、只读 git、诚实状态标记 |
+| [中文](https://solplum.github.io/log-skill/eli5/changelog.html) · [English](https://solplum.github.io/log-skill/eli5/changelog.en.html) | changelog | 本次 vs 本功能、终态 vs 迭代、可读性闸门、交付状态三值 |
 
 ---
 
@@ -618,23 +618,23 @@ MIT. See [LICENSE](./LICENSE).
 ### Claude Code
 
 ```bash
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
-cp -R worklog-alllog/worklog        ~/.claude/skills/worklog
-cp -R worklog-alllog/alllog         ~/.claude/skills/alllog
-cp -R worklog-alllog/change-report  ~/.claude/skills/change-report
-cp -R worklog-alllog/changelog      ~/.claude/skills/changelog
+cp -R log-skill/worklog        ~/.claude/skills/worklog
+cp -R log-skill/alllog         ~/.claude/skills/alllog
+cp -R log-skill/change-report  ~/.claude/skills/change-report
+cp -R log-skill/changelog      ~/.claude/skills/changelog
 ```
 
 ### Codex
 
 ```bash
-git clone https://github.com/2021291696/worklog-alllog.git
+git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
-cp -R worklog-alllog/worklog        ~/.codex/skills/worklog
-cp -R worklog-alllog/alllog         ~/.codex/skills/alllog
-cp -R worklog-alllog/change-report  ~/.codex/skills/change-report
-cp -R worklog-alllog/changelog      ~/.codex/skills/changelog
+cp -R log-skill/worklog        ~/.codex/skills/worklog
+cp -R log-skill/alllog         ~/.codex/skills/alllog
+cp -R log-skill/change-report  ~/.codex/skills/change-report
+cp -R log-skill/changelog      ~/.codex/skills/changelog
 ```
 
 Windows PowerShell 与英文节同构，把四个目录 `Copy-Item -Recurse` 过去即可。拷完重启 CLI 重新加载技能。
