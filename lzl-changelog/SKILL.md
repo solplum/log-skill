@@ -1,9 +1,9 @@
 ---
-name: changelog
-description: "将当前对话或用户指定范围内已经实际发生的改动，整理为带序号、文件映射和证据状态的 Mentor 交接表。当用户调用 /changelog，或要求记录本次改动、比较本地与云端、查看未提交或未推送改动时使用；不要用于仅讨论或计划的总结。"
+name: lzl-changelog
+description: "将当前对话或用户指定范围内已经实际发生的改动，整理为带序号、文件映射和证据状态的 Mentor 交接表。当用户调用 /lzl-changelog，或要求记录本次改动、比较本地与云端、查看未提交或未推送改动时使用；不要用于仅讨论或计划的总结。"
 ---
 
-# Changelog
+# lzl-changelog
 
 Turn the user's request into a concise handoff for a mentor. The user's intent determines the scope; the evidence determines what actually changed.
 
@@ -15,13 +15,14 @@ Turn the user's request into a concise handoff for a mentor. The user's intent d
 4. Exclude plans, suggestions, and discussion-only decisions. Record an item only when a file, diff, commit, PR, or other change record proves that the change occurred. A conversation claim alone is not proof.
 5. Read `references/output-format.md` and produce the complete handoff: scope and evidence summary, numbered main table, then file sections using the same numbers. Sort by impact and independent deliverables, not chat order. Under 全周期 scope, the "before" side of each row is the state before the effort started (not before each iteration).
    **Readability gate (hard, before delivering):** for every row ask — "can someone who did not read this conversation retell, in one plain sentence, what changed?" If not, rewrite the row before delivering. This gate is never skipped.
-6. If the user asks to delete, merge, or reorder items, apply it, renumber continuously, update the file sections, and return the full clean result.
-7. After delivering the report, always end with the closing question (one question, both offers): ① any items to remove (by number — applied per rule 5); ② whether to export the table as an image (ask where to save; see `references/output-format.md` for the export format). If the user declines both, the run ends.
+   **Column-discipline gate (hard, before delivering):** each column answers exactly one question — `问题确认` is the disease only (exists? where? how confirmed?), `本次实际改动` is the fix, `验证结果` is whether the fix works. A `问题确认` cell that mentions fixing or post-fix effects is a violation; rewrite it. This gate is never skipped.
+6. If the user asks to delete, merge, or reorder items, apply it, renumber continuously, update the file sections, and return the full clean result with a 变化点 list (one line per changed row or cell).
+7. After delivering the report, always end with the closing question (one question, both offers): ① any items to remove (by number — applied per rule 5); ② whether to export the table as an image (ask where to save; see `references/output-format.md` for the export format). Render the image only after the user confirms the current text version. If the user declines both, the run ends.
 
 ## Boundaries
 
 - Default to read-only. Do not write `CHANGELOG.md`, commit, push, merge, reset, checkout, or deploy.
 - Never ask the user to choose evidence channels. Choose them from intent; ask only when the target project, comparison base, or access boundary is genuinely ambiguous, and include a recommendation.
-- Keep delivery status separate from validation result. Do not call an item “completed” without evidence.
+- Keep each column to its own question: delivery status separate from validation result, and `问题确认` free of any fixing content. Do not call an item “completed” without evidence.
 - If no actual change is found, use the exact no-change response in `references/output-format.md` and do not emit an empty table.
 - Do not expose secrets, tokens, cookies, private URLs, personal data, or sensitive configuration values. Describe protected configuration generically.

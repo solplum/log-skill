@@ -4,24 +4,30 @@ Use this reference after the scope and evidence are known.
 
 ## Report shape
 
-Start with the scope and evidence actually used:
+Start with a title line, then the scope and evidence actually used. The report is submitted standalone — the title must say what and when without any chat context:
 
 ```text
+<主题> 变更记录（<YYYY-MM-DD>）
 汇总范围：本次对话涉及的实际改动
 判断依据：当前对话、本地 Git diff、测试输出
 ```
 
-Then output this main table:
+Then output this main table — 8 columns. The `模块` column may be dropped only when every row shares one module; state that module once in 汇总范围 instead:
 
 ```markdown
-| 序号 | 改动事项 | 原背景/问题 | 本次实际改动 | 交付状态 | 验证结果 |
-|---:|---|---|---|---|---|
-| 1 | 登录错误分类 | 以前不管哪种登录失败，页面都提示同一句话，用户分不清是密码错了还是网络断了 | 现在密码错误、网络异常、服务故障分别显示不同的提示，用户一眼能看出该重试还是改密码 | 未上传 | 测试通过 |
+| 序号 | 改动事项 | 模块 | 问题确认 | 原背景/问题 | 本次实际改动 | 交付状态 | 验证结果 |
+|---:|---|---|---|---|---|---|---|
+| 1 | 登录错误分类 | 登录 · web 前端 | 已确认（本地：实测输错密码与断网均显示同一句提示） | 以前不管哪种登录失败，页面都提示同一句话，用户分不清是密码错了还是网络断了 | 现在密码错误、网络异常、服务故障分别显示不同的提示，用户一眼能看出该重试还是改密码 | 未上传 | 本地：三类失败场景实测各显示对应提示 |
 ```
 
 Field rules:
 
 - `改动事项` is a short noun phrase naming the changed outcome.
+- `模块` = `<业务模块>[ · <端>]`. Short codes over long names (`cli`, not 「命令行工具」); 端 values like `cli`/`web 前端`/`server 后端`; omit the suffix when the item has no 端 attribute (a CLI tool's own rows are just `cli`).
+- `问题确认` is a terse evidence record, not narration. It answers exactly three questions — 病存在吗、在哪、怎么确认的 — and nothing else. A fixing action or post-fix effect in this cell is a cross-column violation: move it to `本次实际改动`/`验证结果` and rewrite.
+    - Format: outer 「已确认（…）」; inside, each segment is 「地点：证据」 (e.g. 「线上复现：概览接口断连后页面假死，A/B 对照截图」), segments join with 「；」, location first. Repeat evidence of the same kind may be shorthand (「本地实测：同样复现」).
+    - Evidence ladder: runtime reproduction (exit codes, error output, screenshots, A/B 对照) > direct artifact inspection (e.g. 打包产物核验) > code review. If runtime reproduction is feasible it must be done — code review alone never confirms a runtime claim. When direct evidence exists, drop the weaker indirect one.
+    - No 「不适用」 placeholder: a pure addition with no prior problem writes 「无历史问题（新增能力）」.
 - `原背景/问题` describes the real prior state or limitation, not a generic goal.
 - `本次实际改动` describes the observable transition from the old state to the new state.
 
@@ -32,9 +38,18 @@ Plain-language rules (mandatory for `原背景/问题`, `本次实际改动`, an
 - **禁止无主语的纯名词短语句式.** 「将凭证错误、网络异常和服务异常拆分为不同响应与提示」is a banned style — no subject, no scenario, verb-noun stacking. Write the sentence out instead.
 - `原背景/问题` and `本次实际改动` describe the change itself — the problem it addresses and the behavior/content transition. Delivery actions (commit, push, merge, deploy) never appear in these columns or in the `改动事项` name; never name an item with effect-implying words (e.g. “上云/上线”) when only a push happened.
 - `交付状态` tracks one item's delivery progress（未上传 → 已上传 → 已部署，仅此三值）. When a later report covers the same item, keep the item itself unchanged and update only delivery status and validation.
-- `验证结果` must state which environment the evidence comes from (本地/CI/云端/线上); never back one environment's delivery with another environment's validation (local E2E passing does not confirm an online deployment works).
+- `验证结果` opens with the verification channel as a prefix — `本地：` / `CI：` / `云端：` / `线上：` / `通过线上接口：` / `通过线上API：` (the last two label a local run that exercises a real online service) — followed by completed facts only: numbers, exit codes, screenshots. Never back one environment's delivery with another environment's validation (local E2E passing does not confirm an online deployment works). No defensive qualifiers (「未修复版」类): if a fact needs a qualifier to be true, the fact itself is wrong. A pending third-party final check stays a parenthetical, e.g. 「（生产库由李阳终验）」.
 - Avoid vague wording such as “优化了”“完善了” or “处理了一下”. Do not put paths, code blocks, or implementation narration in the main table.
 - A mentor who did not read the conversation should understand every row.
+
+## 提交即终稿（submission-ready）
+
+The table and its PNG go straight to people who never saw this conversation — mentor, reviewer, ticket, MR description. Treat every delivered version as final submission copy:
+
+- Every number, exit code, count, and version claim is re-checked against the evidence gathered this run before delivering — a wrong figure in a submitted artifact is a credibility hit, not a typo.
+- No conversation-dependent references (「同上」「如前所述」「见上文」); every row stands alone.
+- The text version is valid GFM so it pastes cleanly into tickets, MR descriptions, and IM.
+- Secrets and sensitive configuration stay generic per the safety rules; internal colleague and system names are normal handoff content and stay as-is.
 
 ## Item boundaries and order
 
@@ -63,7 +78,17 @@ When deployment depends on a third party rebuilding (e.g. a mentor pulls and re-
 部署说明：改动需 <谁> 拉取 <分支> 并重建后才在线上生效，当前线上未包含。
 ```
 
-`验证结果` must state which environment the evidence comes from (本地/CI/云端/线上); never back one environment's delivery with another environment's validation (local E2E passing does not confirm an online deployment works).
+`验证结果` follows the field rules above: channel prefix, completed facts only. Never back one environment's delivery with another environment's validation (local E2E passing does not confirm an online deployment works).
+
+## 表外注（已确认未修复事项）
+
+Confirmed-but-unfixed problems, and relevant problems outside this change's scope, do not occupy rows — a row needs a change and a delivery status, and these have neither. Hiding them from a handoff is dangerous. List each one in a blockquote immediately after the main table, before the file sections, one line per item:
+
+```markdown
+> 表外注：业务接口无鉴权（管理后台与反馈列表未授权可达）已在线上实锤，尚未修复——方案待与后端负责人确认后实施
+```
+
+Skeleton: `> 表外注：<名称>（<问题概述>）<当前状态与待办>`. Omit the section only when no such item exists.
 
 ## Iteration granularity (asked at the gate)
 
@@ -113,7 +138,7 @@ Treat the first report as a draft. Handle natural-language requests such as:
 把 5 放到最前面
 ```
 
-Apply the operation, renumber continuously, update all file sections, and return the complete clean report rather than only describing the edit.
+Apply the operation, renumber continuously, update all file sections, and return the complete clean report rather than only describing the edit. Attach a 变化点 list — one line per added, removed, or reworded row/cell — so the user can verify without re-reading the whole table.
 
 ## Closing question and image export
 
@@ -124,10 +149,12 @@ Every report ends with the closing question — one question offering both follo
 
 Image export format:
 
-- The image contains only the title line, the meta lines (scope/cloud status/evidence), and the **main table** — never the file sections.
+- **Hard gate — render only after the user confirms the text table.** An unconfirmed version is never screenshotted; apply text edits first, re-confirm, then render.
+- The image contains only the title line, the meta lines (scope/cloud status/evidence), the **main table**, and the 表外注 blockquote — never the file sections.
 - Render the current final version, including any removals applied from ①.
-- Rendering route is flexible; the verified one is: styled HTML table → browser screenshot. Note `file://` may be blocked by the browser tool — serve the HTML over a temporary local HTTP server instead, and stop the server after export. Ask the user for the save path; if the screenshot tool cannot write outside the workspace, save inside and copy the file over.
-- Keep the image readable for chat handoff: fixed-width columns, ~13px body text, full-page capture.
+- One fixed filename per report (e.g. `<主题>-变更记录-<YYYYMMDD>.png`): re-exports overwrite it instead of accumulating versions.
+- Rendering route is flexible; the verified one is: styled HTML table → browser screenshot. Note `file://` may be blocked by the browser tool — serve the HTML over a temporary local HTTP server instead, and stop the server after export. Delete the temporary HTML after the capture. Ask the user for the save path; if the screenshot tool cannot write outside the workspace, save inside and copy the file over.
+- Keep the image readable for chat handoff: fixed-width columns, ~13px body text, full-page capture. Before handing it over, verify the capture: the last row and the 表外注 are fully visible, nothing cropped.
 
 ## No change and safety
 
@@ -142,13 +169,16 @@ Do not count plans, suggestions, or discussion-only decisions. Do not expose sec
 ## Complete example
 
 ```markdown
+登录模块 变更记录（2026-10-15）
 汇总范围：本次对话涉及的实际改动
 判断依据：当前对话、本地 Git diff、测试输出
 
-| 序号 | 改动事项 | 原背景/问题 | 本次实际改动 | 交付状态 | 验证结果 |
-|---:|---|---|---|---|---|
-| 1 | 登录错误分类 | 以前不管哪种登录失败，页面都提示同一句话，用户分不清是密码错了还是网络断了 | 现在密码错误、网络异常、服务故障分别显示不同的提示，用户一眼能看出该重试还是改密码 | 未上传 | 测试通过 |
-| 2 | 重复提交限制 | 以前点提交后如果网络慢，用户可以连点几次，导致同一笔请求被重复发送 | 现在请求发出后提交按钮立即置灰（不可再点），请求结束后才恢复 | 未上传 | 测试通过 |
+| 序号 | 改动事项 | 模块 | 问题确认 | 原背景/问题 | 本次实际改动 | 交付状态 | 验证结果 |
+|---:|---|---|---|---|---|---|---|
+| 1 | 登录错误分类 | 登录 · web 前端 | 已确认（本地：实测输错密码与断网均显示同一句提示） | 以前不管哪种登录失败，页面都提示同一句话，用户分不清是密码错了还是网络断了 | 现在密码错误、网络异常、服务故障分别显示不同的提示，用户一眼能看出该重试还是改密码 | 未上传 | 本地：三类失败场景实测各显示对应提示 |
+| 2 | 重复提交限制 | 登录 · server 后端 | 已确认（本地：连点提交实测同一请求重复到达服务端） | 以前点提交后如果网络慢，用户可以连点几次，导致同一笔请求被重复发送 | 现在服务端识别同一会话的重复提交，只处理第一次，后续请求直接返回首次的结果 | 未上传 | 本地：连点实测服务端仅处理一次，重复请求返回与首次一致 |
+
+> 表外注：登录接口无频率上限（高频重试可打满服务端）已确认，方案待排期，本次未修
 
 ## 具体改动文件
 
@@ -163,6 +193,6 @@ Do not count plans, suggestions, or discussion-only decisions. Do not expose sec
 
 | 文件 | 操作 | 具体变化 |
 |---|---|---|
-| `src/pages/LoginPage.tsx` | 修改 | 提交请求进行中把按钮设为禁用，结束后恢复。 |
-| `tests/pages/LoginPage.test.tsx` | 修改 | 测试连点提交按钮时只发出一次请求。 |
+| `src/auth/session.ts` | 修改 | 同一会话的重复提交请求在服务端去重，只处理第一次。 |
+| `tests/auth/session.test.ts` | 修改 | 测试连点提交时服务端只处理一次请求。 |
 ```
