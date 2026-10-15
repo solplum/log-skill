@@ -98,6 +98,40 @@ class PublishedSkillContractTests(unittest.TestCase):
         for needle in ("交付状态", "已上传", "已部署", "具体改动文件", "本次未发现已经落实的改动"):
             self.assertIn(needle, output)
 
+    def test_lzl_excel_contract(self) -> None:
+        text = _read("lzl-excel/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*lzl-excel\s*$")
+        for needle in (
+            "严格范围只读，绝不擅自线上测量",
+            "有就有，没有就没有",
+            "严重缺失主动提问门",
+            "列职责彻底解耦",
+            "1:1 编号换行严格对齐",
+            "提交即终稿",
+            "references/table-standards.md",
+            "references/feishu-adapter.md",
+            "references/tencent-adapter.md",
+        ):
+            self.assertIn(needle, text)
+        self.assertTrue((REPO / "lzl-excel/references/table-standards.md").is_file())
+        self.assertTrue((REPO / "lzl-excel/references/feishu-adapter.md").is_file())
+        self.assertTrue((REPO / "lzl-excel/references/tencent-adapter.md").is_file())
+        self.assertTrue((REPO / "lzl-excel/agents/openai.yaml").is_file())
+        self.assertTrue((REPO / "lzl-excel/scripts/generate_sheet_payload.py").is_file())
+        standards = _read("lzl-excel/references/table-standards.md")
+        for needle in (
+            "问题确认",
+            "原背景/问题",
+            "本次实际改动",
+            "未上传",
+            "已上传",
+            "已部署",
+            "无历史问题（新增能力）",
+            "表外注",
+            "变更日志",
+        ):
+            self.assertIn(needle, standards)
+
     def test_worklog_agent_contract_present(self) -> None:
         text = _read("lzl-worklog/references/agent-team-contract.md")
         self.assertIn("Agent-CC", text)

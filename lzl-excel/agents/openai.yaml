@@ -1,0 +1,4 @@
+interface:
+  display_name: "Excel"
+  short_description: "将实际改动整理为交付级在线电子表格（飞书/腾讯文档）"
+  default_prompt: "Use $lzl-excel 将本次指定范围内的实际改动整理为标准的交付级在线电子表格。"
