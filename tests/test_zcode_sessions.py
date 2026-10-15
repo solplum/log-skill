@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "worklog" / "scripts"))
+sys.path.insert(0, str(REPO / "lzl-worklog" / "scripts"))
 
 import zcode_sessions  # noqa: E402
 

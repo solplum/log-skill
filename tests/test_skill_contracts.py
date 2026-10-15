@@ -21,8 +21,8 @@ def _read(rel: str) -> str:
 
 class PublishedSkillContractTests(unittest.TestCase):
     def test_worklog_frontmatter_and_modes(self) -> None:
-        text = _read("worklog/SKILL.md")
-        self.assertRegex(text, r"(?m)^name:\s*worklog\s*$")
+        text = _read("lzl-worklog/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*lzl-worklog\s*$")
         self.assertIn("description:", text)
         for needle in (
             "随手记录",
@@ -95,7 +95,7 @@ class PublishedSkillContractTests(unittest.TestCase):
             self.assertIn(needle, output)
 
     def test_worklog_agent_contract_present(self) -> None:
-        text = _read("worklog/references/agent-team-contract.md")
+        text = _read("lzl-worklog/references/agent-team-contract.md")
         self.assertIn("Agent-CC", text)
         self.assertIn("Agent-Codex", text)
         self.assertIn("Agent-Zcode", text)
@@ -122,9 +122,9 @@ class PublishedSkillContractTests(unittest.TestCase):
         self.assertTrue((REPO / "change-report/scripts/project_name.py").is_file())
 
     def test_test_notes_present(self) -> None:
-        self.assertTrue((REPO / "worklog/test/test-worklog.md").is_file())
+        self.assertTrue((REPO / "lzl-worklog/test/test-worklog.md").is_file())
         self.assertTrue((REPO / "alllog/test/test-alllog.md").is_file())
-        self.assertTrue((REPO / "worklog/test/fixtures/fake-cc-session.jsonl").is_file())
+        self.assertTrue((REPO / "lzl-worklog/test/fixtures/fake-cc-session.jsonl").is_file())
         self.assertTrue((REPO / "alllog/test/fixtures/fake-2026-08-01.md").is_file())
 
     def test_eli5_pages_bilingual(self) -> None:

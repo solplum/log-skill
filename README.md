@@ -46,17 +46,18 @@ They never share files. worklog writes under your workspace `报告文档/需求
 
 ## What each skill is
 
-### worklog — weekly demand-narrative report
+### worklog — weekly demand-narrative report (lzl-worklog)
 
-worklog answers "what did I ship this week?" It can:
+worklog (packaged as `lzl-worklog`) answers "what did I ship this week?" It can:
 
-1. **Quick-capture** a one-liner you dictate (`记录一下：…`).
-2. **Mine** recent Claude Code / Codex / ZCode / MiniMax Code sessions and propose numbered candidates. Nothing is written until you pick rows.
-3. **Render** an append-only weekly log into a "demand narrative" report: background → design → what landed → result. Optional Word export if a `docx` skill is installed. Standup wording (`站会` / `晨会`) appends Scrum's three questions.
+1. **First-time onboarding:** prompt for storage directory selection (recommended `~/worklog` global store vs workspace `./报告文档/需求/`) and persist it.
+2. **Quick-capture** a one-liner you dictate (`记录一下：…`).
+3. **Full scan / Mine:** choose full scan to mine all historical sessions directly without re-prompting for date ranges, or mine recent Claude Code / Codex / ZCode / MiniMax Code sessions and propose numbered candidates. Nothing is written until you pick rows.
+4. **Render** an append-only weekly log into a "demand narrative" report: background → design → what landed → result. Optional Word export if a `docx` skill is installed. Standup wording (`站会` / `晨会`) appends Scrum's three questions.
 
 A **scan checkpoint** (`.last-scan`, one date line) lets the next mine start "from last scan" instead of re-asking you for a window. Logs are **append-only**; regenerating a report writes under `周报/` and never rewrites `日志/`.
 
-The report step can spawn up to four light agents — one per source (Agent-CC / Agent-Codex / Agent-Zcode / Agent-Minimax, see `worklog/references/agent-team-contract.md`). A skipped source spawns no agent and produces no empty draft.
+The report step can spawn up to four light agents — one per source (Agent-CC / Agent-Codex / Agent-Zcode / Agent-Minimax, see `lzl-worklog/references/agent-team-contract.md`). A skipped source spawns no agent and produces no empty draft.
 
 ### alllog — résumé material, full history
 
@@ -115,14 +116,14 @@ Use all four. worklog is "what I owe this week." change-report is "what this git
 
 ## Install
 
-Clone this repository, then **copy each skill directory** into the skills folder of every agent CLI you use. Do not copy the repo root; copy `worklog/`, `alllog/`, `change-report/`, and `changelog/` so each folder has its own `SKILL.md` at the top.
+Clone this repository, then **copy each skill directory** into the skills folder of every agent CLI you use. Do not copy the repo root; copy `lzl-worklog/` (or `worklog/`), `alllog/`, `change-report/`, and `changelog/` so each folder has its own `SKILL.md` at the top.
 
 ### Claude Code
 
 ```bash
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
-cp -R log-skill/worklog        ~/.claude/skills/worklog
+cp -R log-skill/lzl-worklog    ~/.claude/skills/lzl-worklog
 cp -R log-skill/alllog         ~/.claude/skills/alllog
 cp -R log-skill/change-report  ~/.claude/skills/change-report
 cp -R log-skill/changelog      ~/.claude/skills/changelog
@@ -133,7 +134,7 @@ Windows PowerShell:
 ```powershell
 git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null
-Copy-Item -Recurse -Force log-skill\worklog       "$env:USERPROFILE\.claude\skills\worklog"
+Copy-Item -Recurse -Force log-skill\lzl-worklog "$env:USERPROFILE\.claude\skills\lzl-worklog"
 Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.claude\skills\alllog"
 Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.claude\skills\change-report"
 Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.claude\skills\changelog"
@@ -144,7 +145,7 @@ Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.claude\skil
 ```bash
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
-cp -R log-skill/worklog        ~/.codex/skills/worklog
+cp -R log-skill/lzl-worklog    ~/.codex/skills/lzl-worklog
 cp -R log-skill/alllog         ~/.codex/skills/alllog
 cp -R log-skill/change-report  ~/.codex/skills/change-report
 cp -R log-skill/changelog      ~/.codex/skills/changelog
@@ -155,7 +156,7 @@ Windows PowerShell:
 ```powershell
 git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex\skills" | Out-Null
-Copy-Item -Recurse -Force log-skill\worklog       "$env:USERPROFILE\.codex\skills\worklog"
+Copy-Item -Recurse -Force log-skill\lzl-worklog "$env:USERPROFILE\.codex\skills\lzl-worklog"
 Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.codex\skills\alllog"
 Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.codex\skills\change-report"
 Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.codex\skills\changelog"
@@ -179,11 +180,13 @@ If you skip this, alllog uses `~/alllog` (`%USERPROFILE%\alllog` on Windows).
 
 ## Slash commands and trigger phrases
 
-### worklog
+### worklog (lzl-worklog)
 
 | You type | Mode |
 | --- | --- |
-| `/worklog` with no extra words | Gate ① — agent asks: quick note / mine recent work / weekly report? |
+| First run | Gate ⓪ — pick storage location (`~/worklog` recommended vs `./报告文档/需求/`) |
+| `/lzl-worklog` or `/worklog` with no extra words | Gate ① — agent asks: full scan / mine recent work / quick note / weekly report? |
+| `全量扫描` / `全量梳理` / `建初始底账` | Mode A — full scan all history (skips Gate ② directly) |
 | `记录一下：…` / `记一下：…` | Mode B — quick capture |
 | `梳理一下最近做了什么` / `梳理一下` | Mode A — mine sessions |
 | `周报` / `汇报` / `产出` / `站会` / `晨会` | Report (standup adds Scrum's three questions) |
@@ -484,7 +487,7 @@ User messages in those logs sometimes contain tokens or passwords. Candidates an
 ## Repository layout
 
 ```
-worklog/                     # copy this folder into ~/.claude/skills/ and ~/.codex/skills/
+lzl-worklog/                 # copy this folder into ~/.claude/skills/ and ~/.codex/skills/
   SKILL.md
   references/agent-team-contract.md
   scripts/zcode_sessions.py
@@ -585,7 +588,7 @@ MIT. See [LICENSE](./LICENSE).
 
 ## 各自是什么
 
-**worklog** 回答「这周交差写什么」。三种用法：你口述一句就记（随手记）；扫描 CC / Codex / ZCode / MiniMax Code 四源会话，列出编号候选，你点名才写入（主动梳理，支持「从上次搜索-现在」断点续扫）；把本周日志收成「需求背景 / 方案 / 落地 / 结果」周报，需要的话再导出 Word，汇报时可并行派最多 4 个轻量 agent 分源提炼。日志只追加；重跑周报只动 `周报/`，不动 `日志/`。
+**worklog**（本仓库对应 `lzl-worklog`）回答「这周交差写什么」。特性：首次使用自动引导选择存储目录（推荐全局 `~/worklog` 或工作区 `报告文档/需求/` 并持久化记忆）；支持一键「全量扫描（建初始底账）」（直接从全量历史起扫，不再重复询问时间段）；日常用法支持口述一句就记（随手记）、扫描 CC / Codex / ZCode / MiniMax Code 四源会话（主动梳理，支持断点续扫）以及把本周日志收成「需求背景 / 方案 / 落地 / 结果」周报，需要的话再导出 Word，汇报时可并行派最多 4 个轻量 agent 分源提炼（契约见 `lzl-worklog/references/agent-team-contract.md`）。日志只追加；重跑周报只动 `周报/`，不动 `日志/`。
 
 **alllog** 回答「哪些能写进简历」。三种用法：口述一条项目素材；挖历史会话（量大先按目录聚项目，每次候选必附**四源覆盖度回执**，杜绝静默漏挖）；把 `素材/日志/` 全量汇总成按项目归组的 `素材/整理/<当天>.md` 快照。对话里出现「素材库」「记简历」**不得**自动启动本技能，必须先打 `/alllog`。
 
@@ -620,7 +623,7 @@ MIT. See [LICENSE](./LICENSE).
 ```bash
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
-cp -R log-skill/worklog        ~/.claude/skills/worklog
+cp -R log-skill/lzl-worklog    ~/.claude/skills/lzl-worklog
 cp -R log-skill/alllog         ~/.claude/skills/alllog
 cp -R log-skill/change-report  ~/.claude/skills/change-report
 cp -R log-skill/changelog      ~/.claude/skills/changelog
@@ -631,7 +634,7 @@ cp -R log-skill/changelog      ~/.claude/skills/changelog
 ```bash
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
-cp -R log-skill/worklog        ~/.codex/skills/worklog
+cp -R log-skill/lzl-worklog    ~/.codex/skills/lzl-worklog
 cp -R log-skill/alllog         ~/.codex/skills/alllog
 cp -R log-skill/change-report  ~/.codex/skills/change-report
 cp -R log-skill/changelog      ~/.codex/skills/changelog
@@ -655,11 +658,13 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 
 ## 斜杠命令与触发词
 
-### worklog
+### worklog (lzl-worklog)
 
 | 你输入 | 模式 |
 | --- | --- |
-| `/worklog`（不带别的字） | 闸口①——问：随手记 / 梳理最近做了什么 / 出周报？ |
+| 首次运行 | 闸口⓪——选择存储目录（推荐全局 `~/worklog` 或工作区 `./报告文档/需求/`） |
+| `/lzl-worklog` 或 `/worklog`（不带别的字） | 闸口①——问：全量扫描 / 梳理最近做了什么 / 随手记 / 出周报？ |
+| `全量扫描` / `全量梳理` / `建初始底账` | 模式 A——全量挖掘历史全部会话（直接开始，免除闸口②） |
 | `记录一下：…` / `记一下：…` | 模式 B——随手记录 |
 | `梳理一下最近做了什么` / `梳理一下` | 模式 A——挖会话 |
 | `周报` / `汇报` / `产出` / `站会` / `晨会` | 出周报（站会加 Scrum 三问） |
@@ -909,7 +914,7 @@ ZCode 库**只读打开**（`mode=ro`）——CLI 运行时正占用它，写句
 ## 仓库结构
 
 ```
-worklog/                     # 整个目录拷进 ~/.claude/skills/ 与 ~/.codex/skills/
+lzl-worklog/                 # 整个目录拷进 ~/.claude/skills/ 与 ~/.codex/skills/
   SKILL.md
   references/agent-team-contract.md
   scripts/zcode_sessions.py
