@@ -40,10 +40,11 @@ class PublishedSkillContractTests(unittest.TestCase):
             "上次搜索断点",
             "报告文档/需求/日志",
             "报告文档/需求/周报",
-            "**需求背景**",
-            "**方案**",
-            "**落地**",
-            "**结果**",
+            "人话三段式",
+            "**痛点问题**",
+            "**关键改动**",
+            "**实际效果**",
+            "下周重点与协作项",
             "agent-team-contract.md",
         ):
             self.assertIn(needle, text)

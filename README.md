@@ -258,16 +258,19 @@ Never overwrite an older bullet.
 5. Write `报告文档/需求/周报/md形式/<start>.md` and delete all intermediate drafts (`<start>-cc-draft.md`, `-codex-`, `-zcode-`, `-minimax-`).
 6. Offer Word export to `报告文档/需求/周报/word形式/<start>.docx` if a docx skill exists.
 
-Template:
+Template (humanized 3-stage narrative, ready to speak in meetings):
 
 ```markdown
 # 产出汇报（<start> ~ <end>）
 
-## 需求：<name>
-- **需求背景**：…
-- **方案**：…
-- **落地**：…
-- **结果**：…   # missing → 待补充, never invent a number
+## 1. <action-driven result title>
+- **痛点问题**：…   # previous pain point or friction
+- **关键改动**：…   # key actions taken (no low-level config/command clutter)
+- **实际效果**：…   # outcome / missing → 待补充, never invent
+
+## 下周重点与协作项
+- **下周规划**：…
+- **需要协调**：…
 ```
 
 ### alllog Mode B — quick capture
@@ -730,16 +733,19 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 5. 写 `周报/md形式/<起点>.md`，删除全部中间草稿（`-cc-` / `-codex-` / `-zcode-` / `-minimax-`）。
 6. 有 docx skill 就问要不要导出 `周报/word形式/<起点>.docx`。
 
-模板：
+模板（人话三段式，组会直接念）：
 
 ```markdown
 # 产出汇报（<起点> ~ <终点>）
 
-## 需求：<需求名>
-- **需求背景**：…
-- **方案**：…
-- **落地**：…
-- **结果**：…   # 缺失标「待补充」，禁止编造
+## 1. <动宾平实成果标题>
+- **痛点问题**：…   # 之前有什么痛点、阻碍或低效
+- **关键改动**：…   # 本周采取了什么关键解决动作，去配置流水账
+- **实际效果**：…   # 现在达到了什么状态，带来什么实际改变；缺失标「待补充」
+
+## 下周重点与协作项
+- **下周规划**：…
+- **需要协调**：…
 ```
 
 ### alllog 模式 B——随手记录
