@@ -455,6 +455,7 @@ worklog and alllog read the same four local stores. A missing store is skipped w
 | Codex — worklog | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/` (flat, top level). **Does not read the index** — in real runs its `thread_name` is usually a useless "你好" | file/folder names, **local** |
 | ZCode | `~/.zcode/cli/db/db.sqlite` (`session` / `message` / `part`) | `session.time_updated`, epoch **milliseconds** |
 | MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | last `message.timestamp` in the file, epoch **milliseconds** — never the folder date |
+| Antigravity (lzl-worklog) | Desktop (`~/.gemini/antigravity/`) + CLI (`~/.gemini/antigravity-cli/`) `conversation_summaries.db` & `brain/*/transcript.jsonl` | `last_modified_time`, **UTC** (dual-source scan) |
 
 Timezone (this is what drops Monday-morning work if you skip it):
 
@@ -883,6 +884,7 @@ worklog 和 alllog 读同一批本地存储，缺哪个源跳过并提示。chan
 | Codex——worklog | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/`（顶层平铺）；**不读索引**——实测索引 thread_name 多为「你好」 | 目录/文件名内嵌**本地**时间 |
 | ZCode | `~/.zcode/cli/db/db.sqlite`（`session` / `message` / `part` 三表） | `session.time_updated`，epoch **毫秒** |
 | MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | 文件内末条 `message.timestamp`，epoch **毫秒**——禁用目录名日期过滤 |
+| Antigravity（lzl-worklog） | 桌面端 `~/.gemini/antigravity/` + CLI `~/.gemini/antigravity-cli/` 双端同构（`conversation_summaries.db` + `transcript.jsonl`） | `last_modified_time`，**UTC** |
 
 时区（漏掉这步，周一早上的活就丢了）：
 

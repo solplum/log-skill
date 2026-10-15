@@ -1,11 +1,11 @@
 ---
 name: lzl-worklog
-description: 记录本周做了什么（CC+Codex+ZCode+MiniMax Code 四源、主动梳理+随手记录双模式），一键生成"需求叙事"周报。首次使用引导存储目录配置并支持全量扫描。触发词："记录一下"、"梳理一下最近做了什么"、"周报"、"汇报"、"产出"、"站会"、"/lzl-worklog"、"/worklog"。数据存配置数据根（默认 ~/worklog 或 报告文档/需求/）。
+description: 记录本周做了什么（CC+Codex+ZCode+MiniMax Code+Antigravity 五源、主动梳理+随手记录双模式），一键生成"需求叙事"周报。首次使用引导存储目录配置并支持全量扫描；汇报默认面向外部读者通俗化（杜绝自嗨与私有代号）。触发词："记录一下"、"梳理一下最近做了什么"、"周报"、"汇报"、"产出"、"站会"、"/lzl-worklog"、"/worklog"。数据存配置数据根（默认 ~/worklog 或 报告文档/需求/）。
 ---
 
 # lzl-worklog 工作产出记录·汇报
 
-记录本周做了什么（会话自动挖：CC/Codex/ZCode/MiniMax Code + 随手主动记），一键生成给别人看的"需求叙事"周报。纯原生工具，无脚本依赖。
+记录本周做了什么（会话自动挖：CC/Codex/ZCode/MiniMax Code/Antigravity + 随手主动记），一键生成给别人看的"需求叙事"周报。纯原生工具，无脚本依赖。
 
 ## 闸口铁律（最高优先级，覆盖一切执行惯性）
 
@@ -66,7 +66,7 @@ MONDAY=$(date -d "$(date +%F) -$((DOW-1)) days" +%F)   # 本周一
 $DATA_ROOT/.last-scan    # 一行，YYYY-MM-DD，= 上次执行会话扫描当天的日期（默认 报告文档/需求/.last-scan）
 ```
 
-- **写入时机**：模式 A 第 2 步四源扫描完成后、汇报第 3 步四源挖完后，执行 `date +%F > "$DATA_ROOT/.last-scan"`。只记录"扫描动作发生的日期"，与本次扫描选的范围起点无关。
+- **写入时机**：模式 A 第 2 步五源扫描完成后、汇报第 3 步五源挖完后，执行 `date +%F > "$DATA_ROOT/.last-scan"`。只记录"扫描动作发生的日期"，与本次扫描选的范围起点无关。
 - **读取**：用户选「从上次搜索-现在」时 `$START=$(cat "$DATA_ROOT/.last-scan" 2>/dev/null)`；文件不存在或为空 → 告知无上次搜索记录，重新展示其余选项（仍在闸口②停轮语义内）。
 - 断点按天粒度衔接：上次扫描当天的新会话会被重扫一次，由「去重」小节兜底跳过，不产生重复条目。
 
@@ -78,6 +78,7 @@ $DATA_ROOT/.last-scan    # 一行，YYYY-MM-DD，= 上次执行会话扫描当�
 | Codex | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` + `archived_sessions/` 兜底 | 目录/文件名（本地时间） |
 | ZCode | `~/.zcode/cli/db/db.sqlite`（SQLite：`session`/`message`/`part` 三表） | `session.time_updated`（epoch 毫秒，绝对时间） |
 | MiniMax Code | `~/.minimax/v2/sessions/YYYY/MM/DD/HH-MM-SS-mmm-session_*/messages.jsonl` | 行内 `message.timestamp`（epoch 毫秒，绝对时间） |
+| Antigravity | 双端同构：桌面端 `~/.gemini/antigravity/` + CLI `~/.gemini/antigravity-cli/` 的 `conversation_summaries.db` 与 `brain/*/transcript.jsonl` | `last_modified_time`（UTC，ISO 8601） |
 
 ### 时区归一（重要，防边界日漏记录）
 - CC `timestamp` 是 UTC（如 `2026-08-12T02:00:00.000Z`，本地 UTC+8 → 08-12 10:00）。
@@ -86,6 +87,24 @@ $DATA_ROOT/.last-scan    # 一行，YYYY-MM-DD，= 上次执行会话扫描当�
 - Codex 目录/文件名已是本地时间，直接比较。
 - ZCode 时间戳是 epoch 毫秒（绝对时间），无时区换算问题：起点转毫秒 `$START_MS=$(( $(date -d "$START 00:00:00" +%s) * 1000 ))` 后直接比较。
 - MiniMax Code 时间戳同为 epoch 毫秒，无换算问题，比较方式同 ZCode；**不要用目录名日期过滤**（跨天长会话会漏，须用消息内末条 timestamp 判断）。
+- Antigravity 时间戳为 UTC ISO 8601 字符串（如 `2026-10-15 08:22:44+00:00`），转本地再比较。**桌面端（IDE / 2.0）与 CLI（agy）物理路径不同源，但底层表与 transcript 结构完全同构**，统一双端扫描合并。
+
+## 外部读者视角与术语通俗化（去黑话铁律）
+
+**周报最终是给 Mentor、上级主管、跨组团队或外部评审看的，严禁直接照搬只有作者自己懂的内部代号与调试流水账。**
+
+提炼候选（第 3 步）、用户确认（第 4 步）、合成周报草案（第 5 步）必须严格遵守以下消歧规则：
+
+1. **私有代号与内部工具通用化（杜绝自嗨孤立词）**：
+   - 严禁出现未加解释的内部代号、私有工具、自研系统简称（如 `Mimosa`、自写脚本名、内部特定平台缩写）。
+   - **替换为行业通用工程/业务语言**：
+     - 例：`Mimosa 提交门禁` / `Mimosa 安全钩子` → 改为 `Git 代码提交静态安全合规门禁` 或 `代码提交规范检查钩子`。
+     - 若确实需要保留专有名词，必须采用 **"通用工程职能（内部代号）"** 形式，如 `代码安全合规门禁系统（Mimosa）`、`数仓自动化同步服务`，确保任何外人都能一眼看懂其业务职能。
+2. **聚焦业务价值与工程成果，拒绝个人调试流水账**：
+   - 严禁把“被内部钩子拦截查原因”当作工作成果（如“排查被 Mimosa 拦截的原因及分类”）。
+   - 必须按规范提炼为业务价值：“完善集群数仓代码提交规范与静态安全检查规则，解除门禁拦截并形成排查指引”。
+3. **第三方库与工具适度泛化说明**：
+   - 遇到技术包名（如 `@larksuite/cli`），说明其业务职能（如“集成飞书开放平台 CLI 工具，打通飞书在线交付表格创建流程”）。
 
 ## ZCode 会话查询（SQLite）
 
@@ -156,6 +175,53 @@ EOF
 - `manifest.json` 有 `createdAtMs`/`updatedAtMs` 但**无标题与工作目录**，会话主题只能用首条真实用户消息。
 - `~/.minimax/` 不存在 → 跳过该源并提示。
 
+## Antigravity 会话查询（桌面端 + CLI 双端全覆盖）
+
+Antigravity（AGY）提供独立 IDE/桌面端与 `agy` 命令行 CLI。**桌面端与 CLI 物理存储不同源（桌面端保存在 `~/.gemini/antigravity/`，CLI 保存在 `~/.gemini/antigravity-cli/`），但两者底层架构完全同构**：均由 `conversation_summaries.db` 管理元数据，`brain/<id>/.system_generated/logs/transcript.jsonl` 保存完整轨迹。脚本执行双端探测与合并：
+
+```bash
+python - "$START" <<'EOF'
+import sqlite3, os, sys, datetime, pathlib, json
+sys.stdout.reconfigure(encoding='utf-8')
+START = sys.argv[1]            # YYYY-MM-DD；全量传 0000-00-00
+dirs = [
+    ('IDE', os.path.expanduser('~/.gemini/antigravity')),
+    ('CLI', os.path.expanduser('~/.gemini/antigravity-cli')),
+]
+seen = set()
+for label, base in dirs:
+    db = os.path.join(base, 'conversation_summaries.db')
+    if not os.path.exists(db): continue
+    try:
+        con = sqlite3.connect(pathlib.Path(db).as_uri() + '?mode=ro', uri=True)
+        cur = con.cursor()
+        for cid, title, lmt, uris in cur.execute(
+            "SELECT conversation_id, title, last_modified_time, workspace_uris "
+            "FROM conversation_summaries ORDER BY last_modified_time DESC"):
+            if not lmt or cid in seen: continue
+            dt_local = datetime.datetime.fromisoformat(lmt).astimezone()
+            if dt_local.strftime('%Y-%m-%d') >= START:
+                seen.add(cid)
+                # 尝试轻读第一条真实用户输入作为补充说明
+                prompt = ''
+                tr = os.path.join(base, 'brain', cid, '.system_generated', 'logs', 'transcript.jsonl')
+                if os.path.exists(tr):
+                    for line in open(tr, encoding='utf-8', errors='ignore'):
+                        try:
+                            o = json.loads(line)
+                            if o.get('type') == 'USER_INPUT' and o.get('content'):
+                                t = o['content'].strip().replace('\n', ' ')
+                                if not t.startswith('<system-reminder'):
+                                    prompt = t[:80]; break
+                        except Exception: pass
+                print(f"[{label}] {dt_local:%Y-%m-%d %H:%M}  {title or '(无标题)'}  {prompt}")
+    except Exception: pass
+EOF
+```
+
+- 任一目录不存在则跳过该目录；两端均不存在则跳过该源并提示。
+- `title` 由高精度模型生成，质量极佳，可直接作为候选主题。
+
 ## 记录 · 模式 B：随手记录
 
 触发词："记录一下：..."、"记一下：..."。零摩擦，用户说啥记啥。
@@ -183,13 +249,14 @@ EOF
      - C. 从上次搜索-现在——起点读「上次搜索断点」（见「上次搜索断点」小节）；无断点记录时告知用户"没有上次搜索记录"并重新展示其余选项等其选择
      - D. 全部历史——全量挖掘历史全部会话（`$START=0000-00-00`，`$START_MS=0`）
      - E. 自定义——向用户要起止日期
-2. **扫最近/全量会话**：
+2. **扫最近/全量会话（五源探测）**：
    - CC：`~/.claude/projects/**/*.jsonl`，按 JSONL 内 `"timestamp"`（转本地时区）筛选 ≥ 起点（全量时不作起点过滤）。
    - Codex：`~/.codex/sessions/YYYY/MM/DD/*.jsonl`（本地时间）+ `archived_sessions/` 兜底，目录/文件名日期 ≥ 起点（全量时扫全部日期）。`~/.codex/` 不存在则跳过该源并提示。
    - ZCode：`~/.zcode/cli/db/db.sqlite` 按「ZCode 会话查询」小节执行，`time_updated >= $START_MS` 筛选（全量时 `$START_MS=0`）。库不存在则跳过该源并提示。
    - MiniMax Code：`~/.minimax/v2/sessions/*/*/*/*-session_*/messages.jsonl` 按「MiniMax Code 会话查询」小节执行，消息内 timestamp（epoch 毫秒）≥ `$START_MS` 筛选（全量时 `$START_MS=0`）。目录不存在则跳过该源并提示。
-   - 四源扫完后执行「上次搜索断点」小节的写入动作。
-3. **提炼候选（仅供展示，禁止直接落盘）**：轻读每个会话的用户消息/工具调用，产出**编号**列表 `1. 日期 + 主题 + 2-3 要点`（不依赖 `session_index.jsonl` 的 thread_name，实测多为"你好"；ZCode 会话可直接用 `session.title` 作主题）。用户消息里可能贴过密钥/token/密码（实测存在），候选与落盘一律脱敏或省略，敏感串不得出现在任何输出中。
+   - Antigravity：按「Antigravity 会话查询」小节同时扫描桌面端 `~/.gemini/antigravity` 与 CLI `~/.gemini/antigravity-cli`，`last_modified_time` 转本地时区 ≥ 起点（全量时不作过滤）。两端均不存在则跳过该源并提示。
+   - 五源扫完后执行「上次搜索断点」小节的写入动作。
+3. **提炼候选（仅供展示，禁止直接落盘）**：轻读各源会话的用户消息/工具调用，产出**编号**列表 `1. 日期 + 主题 + 2-3 要点`。**必须严格执行「外部读者视角与术语通俗化」铁律**：严禁出现外部读者看不懂的内部代号/私有工具名（如 Mimosa 须泛化为"代码提交静态安全检查门禁"），聚焦业务与工程价值，严禁堆砌自嗨流水账。用户消息里的密钥/token/密码一律脱敏或省略，敏感串不得出现在任何输出中。
 4. **用户确认（闸口③，硬停轮，必须精确到条目）**：展示编号候选 + "要记哪几条？"（如"记 1、3"或"只记第 2 条"）后立即结束本轮回复。**用户未明确选择的条目，一律不得写入。** 回答含糊（"都行""好"）≠ 选择，必须再次询问，不得默认全选。
 5. **落盘（只写用户确认的条目）**：严格按用户确认的编号/条目，逐条按模式 B 格式追加到 `$DATA_ROOT/日志/$MONDAY.md`（默认 `报告文档/需求/日志/$MONDAY.md`）。落盘后回执："已写入 N 条：<条目列表>"；未写入的候选列出提醒（可改天再记）。
 
@@ -208,15 +275,15 @@ EOF
 
 1. 计算本周一 `$MONDAY`。
 2. 读 `$DATA_ROOT/日志/$MONDAY.md`（默认 `报告文档/需求/日志/$MONDAY.md`，主动记录）。
-3. **询问日期范围（闸口②，硬停轮）**：展示 A. 本周一-现在（默认）/ B. 七天前-现在 / C. 从上次搜索-现在（无断点记录时说明并重新展示其余选项）/ D. 自定义后立即结束本轮回复；用户明确选择后再按所选范围挖四源会话：CC（timestamp 转本地后属所选范围）＋ Codex（目录日期 ≥ 所选起点）＋ ZCode（db.sqlite 按「ZCode 会话查询」，`time_updated` ≥ 起点）＋ MiniMax Code（messages.jsonl 按「MiniMax Code 会话查询」，timestamp ≥ 起点）。任一源探测不到则跳过并提示。四源挖完后执行「上次搜索断点」小节的写入动作。选定后记扫描起点 `$START`（周报文件名据此）：
+3. **询问日期范围（闸口②，硬停轮）**：展示 A. 本周一-现在（默认）/ B. 七天前-现在 / C. 从上次搜索-现在（无断点记录时说明并重新展示其余选项）/ D. 自定义后立即结束本轮回复；用户明确选择后再按所选范围挖五源会话：CC（timestamp 转本地后属所选范围）＋ Codex（目录日期 ≥ 所选起点）＋ ZCode（db.sqlite 按「ZCode 会话查询」，`time_updated` ≥ 起点）＋ MiniMax Code（messages.jsonl 按「MiniMax Code 会话查询」，timestamp ≥ 起点）＋ Antigravity（双端按「Antigravity 会话查询」，本地日期 ≥ 起点）。任一源探测不到则跳过并提示。五源挖完后执行「上次搜索断点」小节的写入动作。选定后记扫描起点 `$START`（周报文件名据此）：
    - A → `$START=$MONDAY`
    - B → `$START=$(date -d "-6 days" +%F)`（含今天共 7 天）
    - C → `$START=` 断点文件里存的日期
    - D → `$START=` 用户给的起始日期
-4. 并行派 4 个轻量 agent（Claude Code 内用 haiku；ZCode 内用其子代理机制。契约见 `references/agent-team-contract.md`）：Agent-CC → `md形式/$START-cc-draft.md`；Agent-Codex → `md形式/$START-codex-draft.md`；Agent-Zcode → `md形式/$START-zcode-draft.md`；Agent-Minimax → `md形式/$START-minimax-draft.md`。某源本次被跳过时不派对应 agent，不产出空草稿。
-5. 主线程合成草案（暂不落盘）：主动记录 + 各源草稿 → 按"需求叙事"模板整理出完整周报内容，附"将写入 N 条需求"的编号清单（每条一句话）。
+4. 并行派最多 5 个轻量 agent（Claude Code 内用 haiku；其他环境用等价轻量代理。契约见 `references/agent-team-contract.md`）：Agent-CC → `md形式/$START-cc-draft.md`；Agent-Codex → `md形式/$START-codex-draft.md`；Agent-Zcode → `md形式/$START-zcode-draft.md`；Agent-Minimax → `md形式/$START-minimax-draft.md`；Agent-Antigravity → `md形式/$START-antigravity-draft.md`。某源本次被跳过时不派对应 agent，不产出空草稿。
+5. 主线程合成草案（暂不落盘）：主动记录 + 各源草稿 → 严格按「外部读者视角与术语通俗化」去黑话后，按"需求叙事"模板整理出完整周报内容，附"将写入 N 条需求"的编号清单（每条一句话）。
 6. **清单确认（闸口③，硬停轮）**：展示编号清单，问"全部写入，还是删掉哪几条？"后立即结束本轮回复。用户确认后才写入；点名删除的条目剔除；含糊回答必须再问，无确认不写。
-7. 写入 `$DATA_ROOT/周报/md形式/$START.md`（默认 `报告文档/需求/周报/md形式/$START.md`），随后删除全部中间草稿（`$START-cc-draft.md`、`$START-codex-draft.md`、`$START-zcode-draft.md`、`$START-minimax-draft.md` 等本次实际产出的），`md形式/` 只留最终周报。
+7. 写入 `$DATA_ROOT/周报/md形式/$START.md`（默认 `报告文档/需求/周报/md形式/$START.md`），随后删除全部中间草稿（`$START-cc-draft.md`、`$START-codex-draft.md`、`$START-zcode-draft.md`、`$START-minimax-draft.md`、`$START-antigravity-draft.md` 等本次实际产出的），`md形式/` 只留最终周报。
 8. 触发词含"站会/晨会" → 末尾附 Scrum 三问（完成/计划/阻塞）。
 
 ### 需求叙事模板

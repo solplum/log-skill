@@ -34,6 +34,9 @@ class PublishedSkillContractTests(unittest.TestCase):
             "Codex",
             "ZCode",
             "MiniMax Code",
+            "Antigravity",
+            "外部读者视角",
+            "去黑话",
             "上次搜索断点",
             "报告文档/需求/日志",
             "报告文档/需求/周报",
@@ -99,6 +102,8 @@ class PublishedSkillContractTests(unittest.TestCase):
         self.assertIn("Agent-CC", text)
         self.assertIn("Agent-Codex", text)
         self.assertIn("Agent-Zcode", text)
+        self.assertIn("Agent-Antigravity", text)
+        self.assertIn("去黑话与代号通用化", text)
 
     def test_change_report_frontmatter_and_workflow(self) -> None:
         text = _read("change-report/SKILL.md")
