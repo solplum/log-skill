@@ -74,8 +74,8 @@ class PublishedSkillContractTests(unittest.TestCase):
             self.assertIn(needle, text)
 
     def test_changelog_contract(self) -> None:
-        text = _read("changelog/SKILL.md")
-        self.assertRegex(text, r"(?m)^name:\s*changelog\s*$")
+        text = _read("lzl-changelog/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*lzl-changelog\s*$")
         for needle in (
             "Mentor 交接表",
             "本次",
@@ -85,12 +85,12 @@ class PublishedSkillContractTests(unittest.TestCase):
             "CHANGELOG.md",
         ):
             self.assertIn(needle, text)
-        self.assertTrue((REPO / "changelog/references/evidence-routing.md").is_file())
-        self.assertTrue((REPO / "changelog/references/output-format.md").is_file())
-        self.assertTrue((REPO / "changelog/agents/openai.yaml").is_file())
-        evidence = _read("changelog/references/evidence-routing.md")
+        self.assertTrue((REPO / "lzl-changelog/references/evidence-routing.md").is_file())
+        self.assertTrue((REPO / "lzl-changelog/references/output-format.md").is_file())
+        self.assertTrue((REPO / "lzl-changelog/agents/openai.yaml").is_file())
+        evidence = _read("lzl-changelog/references/evidence-routing.md")
         self.assertIn("云端状态", evidence)
-        output = _read("changelog/references/output-format.md")
+        output = _read("lzl-changelog/references/output-format.md")
         for needle in ("交付状态", "已上传", "已部署", "具体改动文件", "本次未发现已经落实的改动"):
             self.assertIn(needle, output)
 
