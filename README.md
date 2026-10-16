@@ -8,12 +8,12 @@ They are instruction skills (`SKILL.md` + references + fixtures). There is no se
 
 | Skill | Job | Trigger style | Storage grain |
 | --- | --- | --- | --- |
-| **worklog** | What did I do this week, written for a manager? | Auto-route from everyday phrases, or `/worklog` | One week, named by **Monday** |
-| **alllog** | What is worth putting on a résumé, grouped by project? | **Manual `/alllog` only** | All time, named by **record day** |
+| **worklog** (`lzl-worklog`) | What did I do this week, written for a manager? | Auto-route from everyday phrases, or `/lzl-worklog` / `/worklog` | One week, named by **Monday** |
+| **alllog** (`lzl-alllog`) | What is worth putting on a résumé, grouped by project? | **Manual `/lzl-alllog` / `/alllog` only** | All time, named by **record day** |
 | **change-report** | What did this git range change, written for a manager? | Everyday phrases or `/change-report` | One git range, named by the **oldest commit date** |
-| **changelog** | What actually changed, as a numbered mentor handoff table? | `/changelog` or everyday phrases | **Nothing on disk by default** (optional image export) |
+| **changelog** (`lzl-changelog`) | What actually changed, as a numbered mentor handoff table? | `/lzl-changelog` / `/changelog` or everyday phrases | **Nothing on disk by default** (optional image export) |
 
-They never share files. worklog writes under your workspace `报告文档/需求/`. change-report writes under workspace `报告文档/代码/<project>/`. alllog writes under a **user-configurable** data root (`ALLLOG_DATA_ROOT`, default `~/alllog`). changelog prints to the conversation and only writes anything (a PNG) if you ask for the export.
+They never share files. worklog writes under your workspace `报告文档/需求/` (or global `~/worklog`). change-report writes under workspace `报告文档/代码/<project>/`. alllog writes under a **user-configurable** data root (`LZL_ALLLOG_DATA_ROOT` / `ALLLOG_DATA_ROOT`, default `~/alllog`, with first-use interactive onboarding). changelog prints to the conversation and only writes anything (a PNG) if you ask for the export.
 
 **Prefer pictures over prose?** Each skill has a dedicated ELI5 explainer page, in both Chinese and English — the links below go to the rendered pages served by **GitHub Pages**. (The `eli5/*.html` files in the repo are the same sources; GitHub's file view shows HTML as code, not as a page.)
 
@@ -59,15 +59,18 @@ A **scan checkpoint** (`.last-scan`, one date line) lets the next mine start "fr
 
 The report step can spawn up to four light agents — one per source (Agent-CC / Agent-Codex / Agent-Zcode / Agent-Minimax, see `lzl-worklog/references/agent-team-contract.md`). A skipped source spawns no agent and produces no empty draft.
 
-### alllog — résumé material, full history
+### alllog (`lzl-alllog`) — résumé material, full history
 
-alllog answers "what from my agent history belongs on a résumé?" It can:
+alllog (in this repository `lzl-alllog`) answers "what from my agent history belongs on a résumé?" It features:
 
-1. **Quick-capture** a project one-liner (`全量记一下：…` / `记简历：…`).
-2. **Mine** all four session sources, cluster by project directory when the set is large, and wait for you to pick both projects and individual bullets. Every candidate list ships with a **coverage receipt** — a four-source table (scanned / included / excluded-with-reason) so a silent source drop cannot hide.
-3. **Roll up** the journal into a per-project digest snapshot (`素材/整理/<today>.md`); résumé-making reads only the newest digest.
+- **Storage onboarding (Gate ⓪):** Prompts on first use if not configured, suggesting global `~/alllog` (recommended) or workspace `./素材/`, saved to `~/.config/lzl-alllog/config.json`.
+- **Full-scan mode:** One-click full scan that bypasses date range questions and starts from the beginning of history.
+- **Five-source mining:** Scans CC, Codex, ZCode, MiniMax Code, and **Antigravity** (both IDE and CLI), with a five-source **coverage receipt** attached to candidates.
+- **External reader & STAR résumé standards:** Eliminates private internal codenames (like Mimosa) and AI debugging artifacts (like sub-agent audits), framing work as clear STAR achievements (background / technical highlight / measurable result).
+- **Quick-capture (Mode B):** `全量记一下：…` / `记简历：…`.
+- **Roll up:** Aggregates `素材/日志/` into a structured per-project digest snapshot (`素材/整理/<today>.md`).
 
-**alllog never starts from casual chat.** The words "素材库" or "记简历" in a normal conversation must not auto-invoke it. You have to type `/alllog` (or name the skill explicitly).
+**alllog never starts from casual chat.** The words "素材库" or "记简历" in a normal conversation must not auto-invoke it. You have to type `/lzl-alllog` or `/alllog` (or name the skill explicitly).
 
 ### change-report — manager-facing git change memo
 
@@ -116,7 +119,7 @@ Use all four. worklog is "what I owe this week." change-report is "what this git
 
 ## Install
 
-Clone this repository, then **copy each skill directory** into the skills folder of every agent CLI you use. Do not copy the repo root; copy `lzl-worklog/` (or `worklog/`), `alllog/`, `change-report/`, and `changelog/` so each folder has its own `SKILL.md` at the top.
+Clone this repository, then **copy each skill directory** into the skills folder of every agent CLI you use. Do not copy the repo root; copy `lzl-worklog/` (or `worklog/`), `lzl-alllog/` (or `alllog/`), `change-report/`, and `changelog/` so each folder has its own `SKILL.md` at the top.
 
 ### Claude Code
 
@@ -124,9 +127,12 @@ Clone this repository, then **copy each skill directory** into the skills folder
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
 cp -R log-skill/lzl-worklog    ~/.claude/skills/lzl-worklog
-cp -R log-skill/alllog         ~/.claude/skills/alllog
+cp -R log-skill/lzl-alllog     ~/.claude/skills/lzl-alllog
 cp -R log-skill/change-report  ~/.claude/skills/change-report
 cp -R log-skill/changelog      ~/.claude/skills/changelog
+# Optional backwards compatibility symlinks:
+ln -s ~/.claude/skills/lzl-worklog ~/.claude/skills/worklog
+ln -s ~/.claude/skills/lzl-alllog  ~/.claude/skills/alllog
 ```
 
 Windows PowerShell:
@@ -135,7 +141,7 @@ Windows PowerShell:
 git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null
 Copy-Item -Recurse -Force log-skill\lzl-worklog "$env:USERPROFILE\.claude\skills\lzl-worklog"
-Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.claude\skills\alllog"
+Copy-Item -Recurse -Force log-skill\lzl-alllog  "$env:USERPROFILE\.claude\skills\lzl-alllog"
 Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.claude\skills\change-report"
 Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.claude\skills\changelog"
 ```
@@ -146,9 +152,12 @@ Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.claude\skil
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
 cp -R log-skill/lzl-worklog    ~/.codex/skills/lzl-worklog
-cp -R log-skill/alllog         ~/.codex/skills/alllog
+cp -R log-skill/lzl-alllog     ~/.codex/skills/lzl-alllog
 cp -R log-skill/change-report  ~/.codex/skills/change-report
 cp -R log-skill/changelog      ~/.codex/skills/changelog
+# Optional backwards compatibility symlinks:
+ln -s ~/.codex/skills/lzl-worklog ~/.codex/skills/worklog
+ln -s ~/.codex/skills/lzl-alllog  ~/.codex/skills/alllog
 ```
 
 Windows PowerShell:
@@ -157,7 +166,7 @@ Windows PowerShell:
 git clone https://github.com/solplum/log-skill.git
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex\skills" | Out-Null
 Copy-Item -Recurse -Force log-skill\lzl-worklog "$env:USERPROFILE\.codex\skills\lzl-worklog"
-Copy-Item -Recurse -Force log-skill\alllog        "$env:USERPROFILE\.codex\skills\alllog"
+Copy-Item -Recurse -Force log-skill\lzl-alllog  "$env:USERPROFILE\.codex\skills\lzl-alllog"
 Copy-Item -Recurse -Force log-skill\change-report "$env:USERPROFILE\.codex\skills\change-report"
 Copy-Item -Recurse -Force log-skill\changelog     "$env:USERPROFILE\.codex\skills\changelog"
 ```
@@ -281,10 +290,10 @@ Template (humanized 3-stage narrative, ready to speak in meetings):
 
 ### alllog Mode A — mine résumé material
 
-1. **Gate ②:** all sessions / **resume from last stop point** (newest journal file name + 1 day; empty journal falls back to "all") / last 30 days / custom. Ask, then stop.
-2. Scan all four sources with the exact scripts embedded in `alllog/SKILL.md` (CC session scan, Codex index-first, ZCode SQLite read-only, MiniMax Code messages.jsonl). Keep exclusion counts for the receipt.
-3. **Gate ③:** if the **combined** four-source session count exceeds 50 (or you chose "all"), cluster by `directory` first and ask which projects. Ask, then stop. Do not default to "all projects." The count must be the four-source total, never one source alone. MiniMax Code sessions carry no `directory` — cluster them into projects by topic keywords instead.
-4. Rank bullets for a résumé: measurable result > hard technical win > architecture call > routine fix. Attach the **coverage receipt** (four-source scanned/included/excluded table; a zero must say whether it is a true void or a method failure).
+1. **Gate ②:** all sessions / **resume from last stop point** (newest journal file name + 1 day; empty journal falls back to "all") / last 30 days / custom. (If you choose **Full scan** in Gate ①, Gate ② is automatically skipped and scanning starts immediately from the beginning of history).
+2. Scan all **five** sources with the exact scripts embedded in `lzl-alllog/SKILL.md` (CC session scan, Codex index-first, ZCode SQLite read-only, MiniMax Code messages.jsonl, and Antigravity dual-end IDE/CLI scan). Keep exclusion counts for the receipt.
+3. **Gate ③:** if the **combined** five-source session count exceeds 50 (or you chose "all"), cluster by `directory` first and ask which projects. Ask, then stop. Do not default to "all projects." The count must be the five-source total, never one source alone.
+4. Extract candidates following the **no-jargon rule** (eliminate private codenames like Mimosa, scrub internal AI debugging traces) and frame as STAR achievements: measurable result > hard technical win > architecture call. Attach the **coverage receipt** (five-source scanned/included/excluded table).
 5. **Gate ④:** numbered list, "which rows?" Ask, then stop.
 6. Append only the rows you named to `素材/日志/`.
 
@@ -415,11 +424,11 @@ $ALLLOG_DATA_ROOT/          # default ~/alllog
 Resolve the root the same way the shipped helper does:
 
 ```bash
-export ALLLOG_DATA_ROOT="$HOME/Documents/resume-materials"
-python alllog/scripts/paths.py                    # prints the root
-python alllog/scripts/paths.py --journal 2026-08-17   # journal file for that day
-python alllog/scripts/paths.py --digest  2026-08-17   # digest file for that day
-python alllog/scripts/paths.py --latest               # newest journal day (resume-from stop point)
+export LZL_ALLLOG_DATA_ROOT="$HOME/Documents/resume-materials"
+python lzl-alllog/scripts/paths.py                    # prints the root
+python lzl-alllog/scripts/paths.py --journal 2026-08-17   # journal file for that day
+python lzl-alllog/scripts/paths.py --digest  2026-08-17   # digest file for that day
+python lzl-alllog/scripts/paths.py --latest               # newest journal day (resume-from stop point)
 ```
 
 Put data **outside** the skill folder so a later `git pull` / recopy cannot wipe it.
@@ -497,9 +506,9 @@ lzl-worklog/                 # copy this folder into ~/.claude/skills/ and ~/.co
   scripts/zcode_sessions.py
   test/test-worklog.md
   test/fixtures/
-alllog/
+lzl-alllog/
   SKILL.md
-  scripts/paths.py           # ALLLOG_DATA_ROOT resolver + journal/digest paths
+  scripts/paths.py           # LZL_ALLLOG_DATA_ROOT resolver + journal/digest paths
   scripts/zcode_sessions.py
   test/test-alllog.md
   test/fixtures/
@@ -535,7 +544,7 @@ python -m unittest discover -s tests -v
 
 The suite calls the shipped `paths.py`, `zcode_sessions.py`, and `project_name.py` entry points, and checks that each `SKILL.md` still names its modes, gates, sources, and output templates — including changelog's scope/granularity gates and delivery-status vocabulary — and that no published file contains author-machine paths.
 
-Manual agent walkthroughs (fixtures only, no live sessions) are in `worklog/test/test-worklog.md` and `alllog/test/test-alllog.md`.
+Manual agent walkthroughs (fixtures only, no live sessions) are in `lzl-worklog/test/test-worklog.md` and `lzl-alllog/test/test-alllog.md`.
 
 ---
 
@@ -555,12 +564,12 @@ MIT. See [LICENSE](./LICENSE).
 
 | 技能 | 干什么 | 怎么触发 | 时间粒度 |
 | --- | --- | --- | --- |
-| **worklog** | 本周做了什么，写成需求叙事周报 | 日常口令或 `/worklog` | 按**本周一**归档 |
-| **alllog** | 哪些内容值得写进简历，按项目归组 | **只能手动 `/alllog`** | 按**记录当天**追加，全量积累 |
+| **worklog** (`lzl-worklog`) | 本周做了什么，写成需求叙事周报 | 日常口令或 `/lzl-worklog` / `/worklog` | 按**本周一**归档 |
+| **alllog** (`lzl-alllog`) | 哪些内容值得写进简历，按项目归组 | **只能手动 `/lzl-alllog` / `/alllog`** | 按**记录当天**追加，全量积累 |
 | **change-report** | 这段 git 改动改了什么，写成给上级的备忘 | 日常口令或 `/change-report` | 按**范围内最旧 commit 日期**命名 |
-| **changelog** | 实际发生了什么改动，整理成带序号的交接表 | `/changelog` 或日常口令 | **本次对话**或**本功能全周期**（每次必问） |
+| **changelog** (`lzl-changelog`) | 实际发生了什么改动，整理成带序号的交接表 | `/lzl-changelog` / `/changelog` 或日常口令 | **本次对话**或**本功能全周期**（每次必问） |
 
-四者文件互不干扰。worklog 写在 `报告文档/需求/`；change-report 写在 `报告文档/代码/<项目>/`；alllog 写在你自己配置的数据根（环境变量 `ALLLOG_DATA_ROOT`，默认 `~/alllog`）；changelog 默认只输出在对话里，仅在你要求时导出 PNG。
+四者文件互不干扰。worklog 写在 `报告文档/需求/`（或全局 `~/worklog`）；change-report 写在 `报告文档/代码/<项目>/`；alllog 写在你自己配置的数据根（环境变量 `LZL_ALLLOG_DATA_ROOT` / `ALLLOG_DATA_ROOT`，默认 `~/alllog`，首次使用提供交互式引导配置）；changelog 默认只输出在对话里，仅在你要求时导出 PNG。
 
 **看文字嫌累？** 每个技能配了中英双语的大白话讲解页——下面的链接直达 **GitHub Pages** 渲染版（仓库里的 `eli5/*.html` 是同一批源文件；GitHub 的文件页对 HTML 只显示源码不渲染，别从那里点）：
 
@@ -594,7 +603,7 @@ MIT. See [LICENSE](./LICENSE).
 
 **worklog**（本仓库对应 `lzl-worklog`）回答「这周交差写什么」。特性：首次使用自动引导选择存储目录（推荐全局 `~/worklog` 或工作区 `报告文档/需求/` 并持久化记忆）；支持一键「全量扫描（建初始底账）」（直接从全量历史起扫，不再重复询问时间段）；日常用法支持口述一句就记（随手记）、扫描 CC / Codex / ZCode / MiniMax Code 四源会话（主动梳理，支持断点续扫）以及把本周日志收成「需求背景 / 方案 / 落地 / 结果」周报，需要的话再导出 Word，汇报时可并行派最多 4 个轻量 agent 分源提炼（契约见 `lzl-worklog/references/agent-team-contract.md`）。日志只追加；重跑周报只动 `周报/`，不动 `日志/`。
 
-**alllog** 回答「哪些能写进简历」。三种用法：口述一条项目素材；挖历史会话（量大先按目录聚项目，每次候选必附**四源覆盖度回执**，杜绝静默漏挖）；把 `素材/日志/` 全量汇总成按项目归组的 `素材/整理/<当天>.md` 快照。对话里出现「素材库」「记简历」**不得**自动启动本技能，必须先打 `/alllog`。
+**alllog**（本仓库对应 `lzl-alllog`）回答「哪些能写进简历」。特性：首次使用自动引导选择存储目录（推荐全局 `~/alllog` 或工作区 `./素材/` 并持久化记忆）；支持一键「全量扫描（建初始底账）」（直接从全量历史起扫，跳过时间段询问）；五源扫描（CC / Codex / ZCode / MiniMax Code / Antigravity 双端）；外部读者与招聘视角去黑话（杜绝 Mimosa 等私有内部代号与 AI 调试痕迹，采用 STAR 规范提炼）；候选清单必附**五源覆盖度回执**，杜绝静默漏挖；把 `素材/日志/` 全量汇总成按项目归组的 `素材/整理/<当天>.md` 快照。对话里出现「素材库」「记简历」**不得**自动启动本技能，必须显式使用 `/lzl-alllog` 或 `/alllog`。
 
 **change-report** 回答「这段 git 改动，给上级怎么写」。只读 `git status` / `log` / `diff`，绝不 commit / push / reset。先圈范围（未提交 / 未推送 / 已推送未合并，或 `--record` / `--range` / `--commit`），起草正式备忘，你确认「为什么」之后才落 `变更记录.md` + md 报告，再委托 `docx` skill 出 Word。推断不出原因就标「原因待确认」，没跑测试就标「未验证」，绝不编造。它还是**可组合、可恢复**的（V3 执行模型，优先于技能内任何冲突规则）：commit 前 / push 前 / push 后 / 补记都能调用，没有规定顺序；重复调用同一范围默认展示或更新 md 草稿再重渲染，md 源保留在 `md形式/`；可选的本地状态索引可记 `reported` 与输出路径，但索引和报告内容都绝不自动 commit / push。
 
@@ -628,9 +637,12 @@ MIT. See [LICENSE](./LICENSE).
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.claude/skills
 cp -R log-skill/lzl-worklog    ~/.claude/skills/lzl-worklog
-cp -R log-skill/alllog         ~/.claude/skills/alllog
+cp -R log-skill/lzl-alllog     ~/.claude/skills/lzl-alllog
 cp -R log-skill/change-report  ~/.claude/skills/change-report
 cp -R log-skill/changelog      ~/.claude/skills/changelog
+# 可选软链接别名：
+ln -s ~/.claude/skills/lzl-worklog ~/.claude/skills/worklog
+ln -s ~/.claude/skills/lzl-alllog  ~/.claude/skills/alllog
 ```
 
 ### Codex
@@ -639,9 +651,12 @@ cp -R log-skill/changelog      ~/.claude/skills/changelog
 git clone https://github.com/solplum/log-skill.git
 mkdir -p ~/.codex/skills
 cp -R log-skill/lzl-worklog    ~/.codex/skills/lzl-worklog
-cp -R log-skill/alllog         ~/.codex/skills/alllog
+cp -R log-skill/lzl-alllog     ~/.codex/skills/lzl-alllog
 cp -R log-skill/change-report  ~/.codex/skills/change-report
 cp -R log-skill/changelog      ~/.codex/skills/changelog
+# 可选软链接别名：
+ln -s ~/.codex/skills/lzl-worklog ~/.codex/skills/worklog
+ln -s ~/.codex/skills/lzl-alllog  ~/.codex/skills/alllog
 ```
 
 Windows PowerShell 与英文节同构，把四个目录 `Copy-Item -Recurse` 过去即可。拷完重启 CLI 重新加载技能。
@@ -756,10 +771,10 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 
 ### alllog 模式 A——挖简历素材
 
-1. **闸口②**：全部 / **从上次停点续挖**（最新日志文件名 +1 天；日志为空等同全部）/ 近 30 天 / 自定义。问完即停。
-2. 四源分别用 `alllog/SKILL.md` 内嵌的**给死脚本**扫描（CC 会话扫 / Codex 索引优先 / ZCode 只读 SQLite / MiniMax messages.jsonl），留存排除计数供回执。
-3. **闸口③**：**四源合计**超 50（或选「全部」）先按 `directory` 聚项目问「挖哪些」。判断必须用四源合计数，禁止单看一个源。
-4. 按简历视角排序候选（可量化 > 技术攻坚 > 架构决策 > 日常修复），**必附四源覆盖度回执**（纳入为 0 要写明是真空还是方法失败）。
+1. **闸口②**：全部 / **从上次停点续挖**（最新日志文件名 +1 天；日志为空等同全部）/ 近 30 天 / 自定义。（若在闸口①选择了「全量扫描」，直接跳过闸口②并从历史起点直接开始扫描）。
+2. 五源分别用 `lzl-alllog/SKILL.md` 内嵌的**给死脚本**扫描（CC 会话扫 / Codex 索引优先 / ZCode 只读 SQLite / MiniMax messages.jsonl / Antigravity 桌面端+CLI 双端探测），留存排除计数供回执。
+3. **闸口③**：**五源合计**超 50（或选「全部」）先按 `directory` 聚项目问「挖哪些」。判断必须用五源合计数，禁止单看一个源。
+4. 严格遵守**去黑话与去自嗨铁律**（消除 Mimosa 等内部代号，抹除 AI 工具链执行痕迹），按简历 STAR 视角提炼候选（可量化 > 技术攻坚 > 架构决策），**同屏必附五源覆盖度回执**（纳入为 0 要写明是真空还是方法失败）。
 5. **闸口④**：编号清单「记哪几条」。问完即停。
 6. 只写你点名的条目到 `素材/日志/`。
 
@@ -847,11 +862,11 @@ $ALLLOG_DATA_ROOT/          # 默认 ~/alllog
 ```
 
 ```bash
-export ALLLOG_DATA_ROOT="$HOME/Documents/resume-materials"
-python alllog/scripts/paths.py                    # 打印数据根
-python alllog/scripts/paths.py --journal 2026-08-17   # 该日日志文件
-python alllog/scripts/paths.py --digest  2026-08-17   # 该日整理快照
-python alllog/scripts/paths.py --latest               # 最新日志日（续挖停点）
+export LZL_ALLLOG_DATA_ROOT="$HOME/Documents/resume-materials"
+python lzl-alllog/scripts/paths.py                    # 打印数据根
+python lzl-alllog/scripts/paths.py --journal 2026-08-17   # 该日日志文件
+python lzl-alllog/scripts/paths.py --digest  2026-08-17   # 该日整理快照
+python lzl-alllog/scripts/paths.py --latest               # 最新日志日（续挖停点）
 ```
 
 数据放技能目录**外面**，防止以后 `git pull` / 重新拷贝时被清掉。
@@ -928,9 +943,9 @@ lzl-worklog/                 # 整个目录拷进 ~/.claude/skills/ 与 ~/.codex
   scripts/zcode_sessions.py
   test/test-worklog.md
   test/fixtures/
-alllog/
+lzl-alllog/
   SKILL.md
-  scripts/paths.py           # ALLLOG_DATA_ROOT 解析 + 日志/整理路径
+  scripts/paths.py           # LZL_ALLLOG_DATA_ROOT 解析 + 日志/整理路径
   scripts/zcode_sessions.py
   test/test-alllog.md
   test/fixtures/
@@ -966,7 +981,7 @@ python -m unittest discover -s tests -v
 
 测试直接驱动随附的 `paths.py`、`zcode_sessions.py`、`project_name.py`，并检查每个 `SKILL.md` 仍写明自己的模式、闸口、数据源与输出模板——包括 changelog 的范围/粒度闸口与交付状态三值——以及任何发布文件里都没有作者机器路径。
 
-手动 agent 走查（只用 fixtures，不碰真实会话）见 `worklog/test/test-worklog.md` 与 `alllog/test/test-alllog.md`。
+手动 agent 走查（只用 fixtures，不碰真实会话）见 `lzl-worklog/test/test-worklog.md` 与 `lzl-alllog/test/test-alllog.md`。
 
 ---
 

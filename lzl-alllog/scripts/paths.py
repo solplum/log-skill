@@ -19,14 +19,31 @@ import sys
 from pathlib import Path
 
 ENV_VAR = "ALLLOG_DATA_ROOT"
+PRIMARY_ENV_VAR = "LZL_ALLLOG_DATA_ROOT"
 DEFAULT_DIRNAME = "alllog"
 
 
 def resolve_data_root(env: dict[str, str] | None = None) -> Path:
     source = os.environ if env is None else env
-    raw = (source.get(ENV_VAR) or "").strip()
-    if raw:
-        return Path(raw).expanduser()
+    for var in (PRIMARY_ENV_VAR, ENV_VAR):
+        raw = (source.get(var) or "").strip()
+        if raw:
+            return Path(raw).expanduser()
+
+    for conf_file in (
+        Path.home() / ".config" / "lzl-alllog" / "config.json",
+        Path.home() / ".config" / "alllog" / "config.json",
+    ):
+        if conf_file.is_file():
+            try:
+                import json
+                data = json.loads(conf_file.read_text(encoding="utf-8"))
+                cfg_root = (data.get("data_root") or "").strip()
+                if cfg_root:
+                    return Path(cfg_root).expanduser()
+            except Exception:
+                pass
+
     return Path.home() / DEFAULT_DIRNAME
 
 

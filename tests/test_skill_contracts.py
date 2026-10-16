@@ -50,23 +50,29 @@ class PublishedSkillContractTests(unittest.TestCase):
             self.assertIn(needle, text)
 
     def test_alllog_frontmatter_configurable_root_and_modes(self) -> None:
-        text = _read("alllog/SKILL.md")
-        self.assertRegex(text, r"(?m)^name:\s*alllog\s*$")
+        text = _read("lzl-alllog/SKILL.md")
+        self.assertRegex(text, r"(?m)^name:\s*lzl-alllog\s*$")
         self.assertIn("ALLLOG_DATA_ROOT", text)
+        self.assertIn("LZL_ALLLOG_DATA_ROOT", text)
         self.assertIn("~/alllog", text)
         self.assertNotIn("D:" + "\\MyAIWorkspace", text)
         self.assertNotIn("/d/" + "MyAIWorkspace", text)
         for needle in (
             "随手记录",
             "主动梳理",
+            "全量扫描",
             "素材库",
             "闸口",
             "禁止自问自答",
-            "仅用户手动 /alllog",
+            "/alllog",
             "~/.claude/projects",
             "Codex",
             "ZCode",
             "MiniMax Code",
+            "Antigravity",
+            "外部读者视角",
+            "去黑话",
+            "Mimosa",
             "ALLLOG_DATA_ROOT",
             "素材/日志",
             "素材/整理",
@@ -163,9 +169,9 @@ class PublishedSkillContractTests(unittest.TestCase):
 
     def test_test_notes_present(self) -> None:
         self.assertTrue((REPO / "lzl-worklog/test/test-worklog.md").is_file())
-        self.assertTrue((REPO / "alllog/test/test-alllog.md").is_file())
+        self.assertTrue((REPO / "lzl-alllog/test/test-alllog.md").is_file())
         self.assertTrue((REPO / "lzl-worklog/test/fixtures/fake-cc-session.jsonl").is_file())
-        self.assertTrue((REPO / "alllog/test/fixtures/fake-2026-08-01.md").is_file())
+        self.assertTrue((REPO / "lzl-alllog/test/fixtures/fake-2026-08-01.md").is_file())
 
     def test_eli5_pages_bilingual(self) -> None:
         for skill in ("worklog", "alllog", "change-report", "changelog"):

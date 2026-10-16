@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "alllog" / "scripts"))
+sys.path.insert(0, str(REPO / "lzl-alllog" / "scripts"))
 
 import paths  # noqa: E402
 
@@ -19,6 +19,16 @@ class ResolveDataRootTests(unittest.TestCase):
         custom = "/tmp/resume-materials-custom"
         got = paths.resolve_data_root({paths.ENV_VAR: custom, "HOME": "/home/someone"})
         self.assertEqual(got, Path(custom))
+
+    def test_primary_env_var_wins_over_fallback(self) -> None:
+        primary = "/tmp/resume-materials-primary"
+        fallback = "/tmp/resume-materials-fallback"
+        got = paths.resolve_data_root({
+            paths.PRIMARY_ENV_VAR: primary,
+            paths.ENV_VAR: fallback,
+            "HOME": "/home/someone",
+        })
+        self.assertEqual(got, Path(primary))
 
     def test_empty_env_falls_back_to_home_alllog(self) -> None:
         got = paths.resolve_data_root({paths.ENV_VAR: "   ", "HOME": "/home/someone"})
@@ -37,7 +47,7 @@ class ResolveDataRootTests(unittest.TestCase):
         env = os.environ.copy()
         env[paths.ENV_VAR] = str(Path("/tmp/alllog-cli-root"))
         proc = subprocess.run(
-            [sys.executable, str(REPO / "alllog" / "scripts" / "paths.py")],
+            [sys.executable, str(REPO / "lzl-alllog" / "scripts" / "paths.py")],
             check=True,
             capture_output=True,
             text=True,
@@ -49,7 +59,7 @@ class ResolveDataRootTests(unittest.TestCase):
         env = os.environ.copy()
         root = Path("/tmp/alllog-cli-root")
         env[paths.ENV_VAR] = str(root)
-        script = str(REPO / "alllog" / "scripts" / "paths.py")
+        script = str(REPO / "lzl-alllog" / "scripts" / "paths.py")
         jr = subprocess.run(
             [sys.executable, script, "--journal", "2026-08-01"],
             check=True,
