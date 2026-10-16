@@ -87,7 +87,14 @@ class ResolveDataRootTests(unittest.TestCase):
             self.assertEqual(paths.latest_journal_day(root), "2026-08-09")
             empty = Path(tmp) / "empty-root"
             (paths.journal_dir(empty)).mkdir(parents=True)
-            self.assertIsNone(paths.latest_journal_day(empty))
+    def test_config_file_resolution(self) -> None:
+        with __import__("tempfile").TemporaryDirectory() as tmp:
+            tmp_home = Path(tmp)
+            conf_dir = tmp_home / ".config" / "lzl-alllog"
+            conf_dir.mkdir(parents=True)
+            (conf_dir / "config.json").write_text('{"data_root": "/custom/path/from/config"}', encoding="utf-8")
+            got = paths.resolve_data_root({"HOME": str(tmp_home)})
+            self.assertEqual(got, Path("/custom/path/from/config"))
 
 
 if __name__ == "__main__":

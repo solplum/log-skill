@@ -292,10 +292,9 @@ Template (humanized 3-stage narrative, ready to speak in meetings):
 
 1. **Gate ②:** all sessions / **resume from last stop point** (newest journal file name + 1 day; empty journal falls back to "all") / last 30 days / custom. (If you choose **Full scan** in Gate ①, Gate ② is automatically skipped and scanning starts immediately from the beginning of history).
 2. Scan all **five** sources with the exact scripts embedded in `lzl-alllog/SKILL.md` (CC session scan, Codex index-first, ZCode SQLite read-only, MiniMax Code messages.jsonl, and Antigravity dual-end IDE/CLI scan). Keep exclusion counts for the receipt.
-3. **Gate ③:** if the **combined** five-source session count exceeds 50 (or you chose "all"), cluster by `directory` first and ask which projects. Ask, then stop. Do not default to "all projects." The count must be the five-source total, never one source alone.
-4. Extract candidates following the **no-jargon rule** (eliminate private codenames like Mimosa, scrub internal AI debugging traces) and frame as STAR achievements: measurable result > hard technical win > architecture call. Attach the **coverage receipt** (five-source scanned/included/excluded table).
-5. **Gate ④:** numbered list, "which rows?" Ask, then stop.
-6. Append only the rows you named to `素材/日志/`.
+3. Extract candidates directly by **business initiatives and facts** (strictly forbidden to cluster by file paths or machine directories) and frame as STAR achievements following the **no-jargon rule** (eliminate private codenames like Mimosa, scrub internal AI debugging traces). Attach the **coverage receipt** (five-source scanned/included/excluded table).
+4. **Gate ③:** numbered list, "which rows to record?" Ask, then stop.
+5. Append only the rows you named to `素材/日志/`.
 
 ### alllog rollup
 
@@ -773,10 +772,9 @@ $env:ALLLOG_DATA_ROOT = "$env:USERPROFILE\Documents\resume-materials"
 
 1. **闸口②**：全部 / **从上次停点续挖**（最新日志文件名 +1 天；日志为空等同全部）/ 近 30 天 / 自定义。（若在闸口①选择了「全量扫描」，直接跳过闸口②并从历史起点直接开始扫描）。
 2. 五源分别用 `lzl-alllog/SKILL.md` 内嵌的**给死脚本**扫描（CC 会话扫 / Codex 索引优先 / ZCode 只读 SQLite / MiniMax messages.jsonl / Antigravity 桌面端+CLI 双端探测），留存排除计数供回执。
-3. **闸口③**：**五源合计**超 50（或选「全部」）先按 `directory` 聚项目问「挖哪些」。判断必须用五源合计数，禁止单看一个源。
-4. 严格遵守**去黑话与去自嗨铁律**（消除 Mimosa 等内部代号，抹除 AI 工具链执行痕迹），按简历 STAR 视角提炼候选（可量化 > 技术攻坚 > 架构决策），**同屏必附五源覆盖度回执**（纳入为 0 要写明是真空还是方法失败）。
-5. **闸口④**：编号清单「记哪几条」。问完即停。
-6. 只写你点名的条目到 `素材/日志/`。
+3. **按事情提炼候选**：严禁按物理路径分类，直接根据五源会话主题与真实工作，按具体事情归并提炼为 STAR 结构化候选清单（去黑话、去自嗨），同屏必附五源覆盖度回执。
+4. **闸口③**：编号清单「记哪几条？」（如“全部”、“记 1, 3”）。问完即停。
+5. 只写你点名的条目到 `素材/日志/`。
 
 ### alllog 汇总
 

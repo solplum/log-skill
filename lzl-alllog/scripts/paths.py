@@ -30,19 +30,21 @@ def resolve_data_root(env: dict[str, str] | None = None) -> Path:
         if raw:
             return Path(raw).expanduser()
 
-    for conf_file in (
-        Path.home() / ".config" / "lzl-alllog" / "config.json",
-        Path.home() / ".config" / "alllog" / "config.json",
-    ):
-        if conf_file.is_file():
-            try:
-                import json
-                data = json.loads(conf_file.read_text(encoding="utf-8"))
-                cfg_root = (data.get("data_root") or "").strip()
-                if cfg_root:
-                    return Path(cfg_root).expanduser()
-            except Exception:
-                pass
+    home = Path(source["HOME"]) if (env is not None and "HOME" in source) else Path.home()
+    if env is None or ("HOME" in source and source["HOME"] != str(Path.home())):
+        for conf_file in (
+            home / ".config" / "lzl-alllog" / "config.json",
+            home / ".config" / "alllog" / "config.json",
+        ):
+            if conf_file.is_file():
+                try:
+                    import json
+                    data = json.loads(conf_file.read_text(encoding="utf-8"))
+                    cfg_root = (data.get("data_root") or "").strip()
+                    if cfg_root:
+                        return Path(cfg_root).expanduser()
+                except Exception:
+                    pass
 
     return Path.home() / DEFAULT_DIRNAME
 
